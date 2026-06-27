@@ -183,7 +183,7 @@ export function RmbConverter(): ReactElement {
   }, []);
 
   return (
-    <section className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-8">
+    <section className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-8">
 
       {/* 页头 */}
       <div className="flex items-center gap-2 mb-6">
@@ -200,7 +200,7 @@ export function RmbConverter(): ReactElement {
           小写金额（支持小数，如 1,688.99）
         </label>
         <div className="flex items-center gap-2">
-          <span className="text-xl font-medium text-muted select-none">¥</span>
+          <span className="text-xl font-semibold text-primary select-none">¥</span>
           <input
             type="text"
             inputMode="decimal"

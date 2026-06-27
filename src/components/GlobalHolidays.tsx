@@ -254,56 +254,59 @@ export function GlobalHolidays(): ReactElement {
   if (!mounted) return <div className="min-h-[60vh]" />;
 
   return (
-    <section className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-8">
-      {/* 页头 */}
-      <div className="flex items-center gap-2 mb-5">
-        <span className="text-primary"><GlobeIcon /></span>
-        <h1 className="text-lg font-semibold text-foreground">全球假日</h1>
-        <span className="text-xs text-muted ml-1">2026 · 共 {totalHolidays} 个</span>
-      </div>
-
-      {/* 一级分类 Tabs */}
-      <div className="flex items-center gap-0.5 bg-white/[0.04] border border-white/8 rounded-xl p-1 mb-4">
-        {CAT_TABS.map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => handleCatChange(tab.key)}
-            className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
-              catFilter === tab.key
-                ? "bg-white/[0.10] text-foreground shadow-sm"
-                : "text-muted hover:text-foreground"
-            }`}
-          >
-            {tab.dot && <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${tab.dot}`} />}
-            <span className="truncate">{tab.label}</span>
-          </button>
-        ))}
-      </div>
-
-      {/* 二级筛选芯片 */}
-      {subChipsConfig.show && (
-        <div className="mb-4 -mx-4 sm:-mx-6 px-4 sm:px-6 overflow-x-auto">
-          <div className="flex items-center gap-1.5 flex-nowrap pb-1 min-w-max">
-            {subChipsConfig.chips.map(chip => {
-              const isActive = chip.key === subFilter;
-              return (
-                <button
-                  key={chip.key}
-                  onClick={() => setSubFilter(chip.key)}
-                  className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors whitespace-nowrap ${
-                    isActive
-                      ? "bg-primary border-primary/60 text-background"
-                      : "bg-white/[0.04] border-white/10 text-muted hover:text-foreground hover:border-white/20"
-                  }`}
-                >
-                  {chip.emoji && <span className="text-sm leading-none">{chip.emoji}</span>}
-                  {chip.label}
-                </button>
-              );
-            })}
-          </div>
+    <section className="w-full max-w-4xl mx-auto px-4 sm:px-6">
+      {/* ── 固定头部 ── */}
+      <div className="sticky top-0 z-10 bg-background pt-6 pb-3">
+        {/* 页头 */}
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-primary"><GlobeIcon /></span>
+          <h1 className="text-lg font-semibold text-foreground">全球假日</h1>
+          <span className="text-xs text-muted ml-1">2026 · 共 {totalHolidays} 个</span>
         </div>
-      )}
+
+        {/* 一级分类 Tabs */}
+        <div className="flex items-center gap-0.5 bg-white/[0.04] border border-white/8 rounded-xl p-1 mb-3">
+          {CAT_TABS.map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => handleCatChange(tab.key)}
+              className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
+                catFilter === tab.key
+                  ? "bg-white/[0.10] text-foreground shadow-sm"
+                  : "text-muted hover:text-foreground"
+              }`}
+            >
+              {tab.dot && <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${tab.dot}`} />}
+              <span className="truncate">{tab.label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* 二级筛选芯片 */}
+        {subChipsConfig.show && (
+          <div className="-mx-4 sm:-mx-6 px-4 sm:px-6 overflow-x-auto">
+            <div className="flex items-center gap-1.5 flex-nowrap pb-1 min-w-max">
+              {subChipsConfig.chips.map(chip => {
+                const isActive = chip.key === subFilter;
+                return (
+                  <button
+                    key={chip.key}
+                    onClick={() => setSubFilter(chip.key)}
+                    className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors whitespace-nowrap ${
+                      isActive
+                        ? "bg-primary border-primary/60 text-background"
+                        : "bg-white/[0.04] border-white/10 text-muted hover:text-foreground hover:border-white/20"
+                    }`}
+                  >
+                    {chip.emoji && <span className="text-sm leading-none">{chip.emoji}</span>}
+                    {chip.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* 假日列表 */}
       {grouped.length === 0 ? (
@@ -339,7 +342,7 @@ export function GlobalHolidays(): ReactElement {
       )}
 
       {/* 底部说明 */}
-      <div className="mt-6 flex items-start gap-2 p-3 rounded-lg bg-white/[0.04] border border-white/8 text-xs text-muted">
+      <div className="mt-6 mb-8 flex items-start gap-2 p-3 rounded-lg bg-white/[0.04] border border-white/8 text-xs text-muted">
         <InfoIcon />
         <span>开斋节、犹太新年等宗教节日按伊斯兰历或希伯来历推算，实际日期可能有 ±1~2 天误差。</span>
       </div>

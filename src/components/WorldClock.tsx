@@ -438,7 +438,7 @@ export function WorldClock(): ReactElement {
   if (!mounted) return <div className="min-h-[60vh]" />;
 
   return (
-    <section className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-8">
+    <section className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-8">
       {/* 页头 */}
       <div className="flex items-start justify-between gap-3 mb-6">
         <div>

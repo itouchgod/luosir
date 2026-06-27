@@ -2,21 +2,21 @@
 
 /* ── 暗色模式（默认） ──────────────────────────────────────── */
 :root {
-  --color-primary: #d97706;
-  --color-primary-end: #f97316;
-  --color-accent: #fbbf24;
-  --color-background: #0c0800;
-  --color-background-secondary: #1a1100;
-  --color-text-primary: #fef3c7;
-  --color-text-secondary: #a8936c;
+  --color-primary: #58a6ff;
+  --color-primary-end: #388bfd;
+  --color-accent: #79c0ff;
+  --color-background: #0d1117;
+  --color-background-secondary: #161b22;
+  --color-text-primary: #e6edf3;
+  --color-text-secondary: #8b949e;
   --background: var(--color-background);
   --foreground: var(--color-text-primary);
   --timeline-gradient: linear-gradient(to right,
-    #1c0a00 0%,        #1c0a00 20.83%,
-    #78350f 25%,       #d97706 33.33%,
-    #fbbf24 37.5%,     #fbbf24 66.67%,
-    #d97706 70.83%,    #78350f 79.17%,
-    #1c0a00 83.33%,    #1c0a00 100%
+    #4b5563 0%,        #4b5563 20.83%,
+    #d4a017 25%,       #388bfd 33.33%,
+    #58a6ff 37.5%,     #58a6ff 66.67%,
+    #388bfd 70.83%,    #d4a017 79.17%,
+    #4b5563 83.33%,    #4b5563 100%
   );
 }
 
@@ -96,8 +96,8 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at 15% 10%, rgba(217, 119, 6, 0.22), transparent 28rem),
-    radial-gradient(circle at 85% 5%, rgba(249, 115, 22, 0.16), transparent 26rem),
+    radial-gradient(circle at 20% 15%, rgba(56,139,253,0.09), transparent 30rem),
+    radial-gradient(circle at 80% 8%, rgba(88,166,255,0.06), transparent 25rem),
     var(--color-background);
   color: var(--color-text-primary);
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
@@ -112,7 +112,7 @@ html[data-theme="light"] body {
 }
 
 ::selection {
-  background: rgba(217, 119, 6, 0.30);
+  background: rgba(88, 166, 255, 0.28);
   color: var(--color-text-primary);
 }
 
