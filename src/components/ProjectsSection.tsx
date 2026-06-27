@@ -8,7 +8,7 @@ const projects: readonly Project[] = [
     id: "aurora",
     name: "Aurora Studio",
     description:
-      "A collaborative workspace for product teams to plan launches, track creative assets, and review release readiness.",
+      "面向产品团队的协作工作台，支持发布计划管理、创意资产追踪与上线就绪评审。",
     technologies: ["Next.js", "TypeScript", "PostgreSQL"],
     gradient: "from-violet-500 via-fuchsia-500 to-blue-500",
     links: {
@@ -20,7 +20,7 @@ const projects: readonly Project[] = [
     id: "pulse",
     name: "Pulse Metrics",
     description:
-      "A real-time analytics dashboard with sharp data hierarchy, responsive charts, and executive reporting views.",
+      "实时数据分析仪表盘，具备清晰的数据层级、响应式图表与管理报告视图。",
     technologies: ["React", "Tailwind CSS", "Charts"],
     gradient: "from-cyan-400 via-blue-500 to-violet-600",
     links: {
@@ -32,7 +32,7 @@ const projects: readonly Project[] = [
     id: "northstar",
     name: "Northstar CRM",
     description:
-      "A focused relationship management tool for boutique studios handling leads, retainers, and client timelines.",
+      "专为精品工作室打造的客户关系管理工具，涵盖线索跟进、合同管理与项目时间线。",
     technologies: ["Next.js", "Prisma", "Vercel"],
     gradient: "from-pink-500 via-rose-500 to-orange-400",
     links: {
@@ -48,14 +48,13 @@ export function ProjectsSection(): ReactElement {
       <div className="mx-auto max-w-7xl">
         <div className="max-w-3xl">
           <p className="text-sm font-semibold uppercase tracking-[0.22em] text-accent">
-            Selected work
+            精选项目
           </p>
           <h2 className="mt-3 font-heading text-4xl font-bold text-foreground sm:text-6xl">
-            Recent projects with a sharp product edge.
+            近期作品，兼顾视觉与技术深度。
           </h2>
           <p className="mt-5 text-base leading-8 text-muted sm:text-lg">
-            A compact set of mock projects showing the visual and technical
-            direction of this portfolio.
+            展示设计方向与技术选型的代表性项目集合。
           </p>
         </div>
 

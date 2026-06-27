@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ReactElement } from "react";
 import { useEffect, useState } from "react";
 import { BrandMark } from "./BrandMark";
+import { ThemeToggle } from "./ThemeToggle";
 
 type NavItem = {
   readonly label: string;
@@ -11,9 +12,10 @@ type NavItem = {
 };
 
 const navItems: readonly NavItem[] = [
-  { label: "About", href: "#about" },
-  { label: "Work", href: "#work" },
-  { label: "Contact", href: "#contact" },
+  { label: "导航", href: "/go" },
+  { label: "关于", href: "#about" },
+  { label: "项目", href: "#work" },
+  { label: "联系", href: "#contact" },
 ];
 
 export function Navbar(): ReactElement {
@@ -52,7 +54,7 @@ export function Navbar(): ReactElement {
           <span>Luo Sir</span>
         </Link>
 
-        <div className="hidden items-center gap-8 md:flex">
+        <div className="hidden items-center gap-6 md:flex">
           {navItems.map((item) => (
             <Link
               key={item.href}
@@ -62,6 +64,7 @@ export function Navbar(): ReactElement {
               {item.label}
             </Link>
           ))}
+          <ThemeToggle />
         </div>
 
         <button

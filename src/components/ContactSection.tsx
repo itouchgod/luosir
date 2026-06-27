@@ -44,14 +44,13 @@ export function ContactSection(): ReactElement {
 
       <div className="mx-auto max-w-3xl text-center">
         <p className="text-sm font-semibold uppercase tracking-[0.22em] text-primary-end">
-          Contact
+          联系我
         </p>
         <h2 className="mt-3 font-heading text-4xl font-bold text-foreground sm:text-6xl">
-          Let&apos;s build something that stands out.
+          一起打造出众的产品。
         </h2>
         <p className="mt-5 text-base leading-8 text-muted sm:text-lg">
-          Tell me about the product, deadline, and outcome you want. I will
-          reply with next steps and a clear path forward.
+          告诉我你的产品想法、交付时间与目标。我会快速回复并给出清晰的推进方案。
         </p>
 
         <div className="mt-8 flex justify-center gap-3">
@@ -84,17 +83,17 @@ export function ContactSection(): ReactElement {
         >
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="grid gap-2 text-sm font-semibold text-foreground">
-              Name
+              姓名
               <input
                 name="name"
                 required
                 autoComplete="name"
                 className="h-12 rounded-xl border border-white/10 bg-white/[0.04] px-4 text-sm font-medium text-foreground outline-none transition placeholder:text-muted/70 focus:border-primary/70 focus:ring-4 focus:ring-primary/15"
-                placeholder="Your name"
+                placeholder="你的姓名"
               />
             </label>
             <label className="grid gap-2 text-sm font-semibold text-foreground">
-              Email
+              邮箱
               <input
                 name="email"
                 type="email"
@@ -107,13 +106,13 @@ export function ContactSection(): ReactElement {
           </div>
 
           <label className="grid gap-2 text-sm font-semibold text-foreground">
-            Message
+            留言
             <textarea
               name="message"
               required
               rows={5}
               className="resize-none rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm font-medium text-foreground outline-none transition placeholder:text-muted/70 focus:border-primary/70 focus:ring-4 focus:ring-primary/15"
-              placeholder="Share a few details about your project"
+              placeholder="简单描述你的项目需求"
             />
           </label>
 
@@ -121,12 +120,12 @@ export function ContactSection(): ReactElement {
             type="submit"
             className="animate-gradient-shift h-12 rounded-full bg-gradient-to-r from-primary via-accent to-primary-end px-6 text-sm font-bold text-white shadow-[0_18px_60px_rgba(124,58,237,0.34)] transition hover:-translate-y-0.5"
           >
-            Send message
+            发送消息
           </button>
 
           {isSubmitted ? (
             <p className="rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm font-semibold text-emerald-200">
-              Thanks. Your message is ready for review.
+              已收到，感谢你的留言，我会尽快回复。
             </p>
           ) : null}
         </Form>

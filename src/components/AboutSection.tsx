@@ -27,27 +27,25 @@ export function AboutSection(): ReactElement {
             </div>
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.22em] text-accent">
-                About
+                关于我
               </p>
               <h2 className="mt-3 font-heading text-3xl font-bold text-foreground sm:text-4xl">
-                I build interfaces that feel precise, fast, and memorable.
+                打造精准、快速、令人难忘的数字界面。
               </h2>
             </div>
           </div>
           <p className="mt-7 text-base leading-8 text-muted">
-            I am a full-stack engineer focused on modern web experiences,
-            design-led product thinking, and production systems that stay easy
-            to evolve. My work spans landing pages, SaaS dashboards, commerce
-            flows, and internal tools.
+            专注于现代 Web 体验、设计驱动的产品思维与易于迭代的生产系统。
+            项目涵盖落地页、SaaS 仪表盘、电商流程与内部工具。
           </p>
         </div>
 
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.22em] text-primary-end">
-            Skill stack
+            技术栈
           </p>
           <h3 className="mt-3 font-heading text-3xl font-bold text-foreground sm:text-5xl">
-            From concept to shipped product.
+            从构想到交付，全程掌控。
           </h3>
           <div className="mt-8 flex flex-wrap gap-3">
             {skills.map((skill) => (

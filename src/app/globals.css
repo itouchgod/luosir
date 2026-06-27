@@ -1,16 +1,75 @@
 @import "tailwindcss";
 
+/* ── 暗色模式（默认） ──────────────────────────────────────── */
 :root {
-  --color-primary: #7c3aed;
-  --color-primary-end: #2563eb;
-  --color-accent: #ec4899;
-  --color-background: #0a0a0f;
-  --color-background-secondary: #111118;
-  --color-text-primary: #f1f5f9;
-  --color-text-secondary: #94a3b8;
+  --color-primary: #d97706;
+  --color-primary-end: #f97316;
+  --color-accent: #fbbf24;
+  --color-background: #0c0800;
+  --color-background-secondary: #1a1100;
+  --color-text-primary: #fef3c7;
+  --color-text-secondary: #a8936c;
   --background: var(--color-background);
   --foreground: var(--color-text-primary);
+  --timeline-gradient: linear-gradient(to right,
+    #1c0a00 0%,        #1c0a00 20.83%,
+    #78350f 25%,       #d97706 33.33%,
+    #fbbf24 37.5%,     #fbbf24 66.67%,
+    #d97706 70.83%,    #78350f 79.17%,
+    #1c0a00 83.33%,    #1c0a00 100%
+  );
 }
+
+/* ── 亮色护眼模式 ─────────────────────────────────────────── */
+html[data-theme="light"] {
+  --color-primary: #2d7a50;
+  --color-primary-end: #1e6b42;
+  --color-accent: #52b788;
+  --color-background: #f0f4ec;
+  --color-background-secondary: #e2ead8;
+  --color-text-primary: #1a2f1e;
+  --color-text-secondary: #4d6e58;
+  --background: var(--color-background);
+  --foreground: var(--color-text-primary);
+  --timeline-gradient: linear-gradient(to right,
+    #b0bdb8 0%,        #b0bdb8 20.83%,
+    #e8c84a 25%,       #2d7a50 33.33%,
+    #1e6b42 37.5%,     #1e6b42 66.67%,
+    #2d7a50 70.83%,    #e8c84a 79.17%,
+    #b0bdb8 83.33%,    #b0bdb8 100%
+  );
+}
+
+/* ── 亮色下 white-opacity → 绿调 black-opacity ────────────── */
+html[data-theme="light"] .border-white\/8  { border-color: rgba(30,80,50,0.10) !important; }
+html[data-theme="light"] .border-white\/10 { border-color: rgba(30,80,50,0.13) !important; }
+html[data-theme="light"] .border-white\/15 { border-color: rgba(30,80,50,0.16) !important; }
+html[data-theme="light"] .border-white\/20 { border-color: rgba(30,80,50,0.20) !important; }
+html[data-theme="light"] .border-white\/25 { border-color: rgba(30,80,50,0.24) !important; }
+html[data-theme="light"] .border-white\/30 { border-color: rgba(30,80,50,0.28) !important; }
+html[data-theme="light"] .bg-white\/5,
+html[data-theme="light"] .bg-white\/\[0\.05\] { background-color: rgba(30,80,50,0.05) !important; }
+html[data-theme="light"] .bg-white\/\[0\.04\]  { background-color: rgba(30,80,50,0.05) !important; }
+html[data-theme="light"] .bg-white\/\[0\.03\]  { background-color: rgba(30,80,50,0.04) !important; }
+html[data-theme="light"] .bg-white\/\[0\.06\]  { background-color: rgba(30,80,50,0.06) !important; }
+html[data-theme="light"] .bg-white\/\[0\.07\]  { background-color: rgba(30,80,50,0.07) !important; }
+html[data-theme="light"] .text-white\/40 { color: rgba(26,47,30,0.50) !important; }
+html[data-theme="light"] .text-white\/35 { color: rgba(26,47,30,0.45) !important; }
+html[data-theme="light"] .bg-white\/15    { background-color: rgba(30,80,50,0.10) !important; }
+
+/* ── 亮色下世界时钟工作状态徽章 ──────────────────────────── */
+html[data-theme="light"] .text-emerald-300  { color: #065f46 !important; }
+html[data-theme="light"] .bg-emerald-500\/20 { background-color: rgba(6,95,70,0.10) !important; }
+html[data-theme="light"] .border-emerald-500\/25 { border-color: rgba(6,95,70,0.20) !important; }
+html[data-theme="light"] .text-amber-200    { color: #78350f !important; }
+html[data-theme="light"] .bg-amber-500\/20  { background-color: rgba(120,53,15,0.10) !important; }
+html[data-theme="light"] .border-amber-500\/25 { border-color: rgba(120,53,15,0.20) !important; }
+
+/* ── 亮色下天+日期徽章 ───────────────────────────────────── */
+html[data-theme="light"] .text-emerald-300.bg-emerald-500\/15 { color: #065f46 !important; }
+html[data-theme="light"] .text-orange-200  { color: #9a3412 !important; }
+html[data-theme="light"] .bg-orange-500\/15 { background-color: rgba(154,52,18,0.10) !important; }
+html[data-theme="light"] .border-orange-500\/20 { border-color: rgba(154,52,18,0.18) !important; }
 
 @theme inline {
   --color-background: var(--background);
@@ -37,15 +96,28 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at 15% 10%, rgba(124, 58, 237, 0.2), transparent 28rem),
-    radial-gradient(circle at 85% 5%, rgba(37, 99, 235, 0.16), transparent 26rem),
+    radial-gradient(circle at 15% 10%, rgba(217, 119, 6, 0.22), transparent 28rem),
+    radial-gradient(circle at 85% 5%, rgba(249, 115, 22, 0.16), transparent 26rem),
     var(--color-background);
   color: var(--color-text-primary);
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+  transition: background-color 0.3s ease, color 0.2s ease;
+}
+
+html[data-theme="light"] body {
+  background:
+    radial-gradient(circle at 15% 10%, rgba(82,183,136,0.18), transparent 28rem),
+    radial-gradient(circle at 85% 5%, rgba(45,122,80,0.12), transparent 26rem),
+    var(--color-background);
 }
 
 ::selection {
-  background: rgba(236, 72, 153, 0.34);
+  background: rgba(217, 119, 6, 0.30);
+  color: var(--color-text-primary);
+}
+
+html[data-theme="light"] ::selection {
+  background: rgba(82, 183, 136, 0.35);
   color: var(--color-text-primary);
 }
 

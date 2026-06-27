@@ -3,344 +3,200 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ChangeEvent, ReactElement } from "react";
-import { useEffect, useMemo, useState } from "react";
-import { BrandMark } from "@/components/BrandMark";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { NAV_CATEGORIES, type NavCategory, type NavLink } from "@/data/go-links";
 
-type VisibleCategory = NavCategory & {
-  links: NavLink[];
-};
+type VisibleCategory = NavCategory & { links: NavLink[] };
 
 function getHostname(url: string): string {
-  return new URL(url).hostname;
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return url;
+  }
 }
 
 function getFaviconUrl(url: string): string {
-  const hostname = getHostname(url);
-  const params = new URLSearchParams({ domain: hostname, sz: "32" });
-
-  return `https://www.google.com/s2/favicons?${params.toString()}`;
+  return `https://www.google.com/s2/favicons?domain=${getHostname(url)}&sz=32`;
 }
 
 export default function GoPage(): ReactElement {
   const [query, setQuery] = useState("");
-  const [activeCategoryId, setActiveCategoryId] = useState(
-    NAV_CATEGORIES[0]?.id ?? ""
-  );
+  const [activeCategoryId, setActiveCategoryId] = useState(NAV_CATEGORIES[0]?.id ?? "");
+  const mainRef = useRef<HTMLDivElement>(null);
 
   const normalizedQuery = query.trim().toLowerCase();
 
   const visibleCategories = useMemo<VisibleCategory[]>(() => {
-    return NAV_CATEGORIES.map((category) => ({
-      ...category,
+    return NAV_CATEGORIES.map((cat) => ({
+      ...cat,
       links: normalizedQuery
-        ? category.links.filter((link) =>
-            link.name.toLowerCase().includes(normalizedQuery)
-          )
-        : category.links,
-    })).filter((category) => category.links.length > 0);
+        ? cat.links.filter((l) => l.name.toLowerCase().includes(normalizedQuery))
+        : cat.links,
+    })).filter((cat) => cat.links.length > 0);
   }, [normalizedQuery]);
 
+  // Reset active when search changes
   useEffect(() => {
-    if (
-      visibleCategories.length > 0 &&
-      !visibleCategories.some((category) => category.id === activeCategoryId)
-    ) {
+    if (visibleCategories.length > 0 && !visibleCategories.some((c) => c.id === activeCategoryId)) {
       setActiveCategoryId(visibleCategories[0].id);
     }
   }, [activeCategoryId, visibleCategories]);
 
+  // IntersectionObserver for sidebar highlight
   useEffect(() => {
-    if (visibleCategories.length === 0) {
-      return;
-    }
-
+    if (visibleCategories.length === 0) return;
     const observer = new IntersectionObserver(
       (entries) => {
-        const visibleEntry = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((left, right) => right.intersectionRatio - left.intersectionRatio)
+        const hit = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
           .at(0);
-
-        if (visibleEntry?.target.id) {
-          setActiveCategoryId(visibleEntry.target.id);
-        }
+        if (hit?.target.id) setActiveCategoryId(hit.target.id);
       },
-      {
-        rootMargin: "-28% 0px -58% 0px",
-        threshold: [0.08, 0.2, 0.4, 0.6],
-      }
+      { rootMargin: "-20% 0px -65% 0px", threshold: [0.05, 0.2, 0.5] }
     );
-
-    for (const category of visibleCategories) {
-      const section = document.getElementById(category.id);
-
-      if (section) {
-        observer.observe(section);
-      }
-    }
-
+    visibleCategories.forEach((cat) => {
+      const el = document.getElementById(cat.id);
+      if (el) observer.observe(el);
+    });
     return () => observer.disconnect();
   }, [visibleCategories]);
 
-  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setQuery(event.target.value);
-  };
+  const onSearch = (e: ChangeEvent<HTMLInputElement>) => setQuery(e.target.value);
 
   return (
-    <main className="min-h-screen overflow-hidden bg-background text-foreground">
-      <div className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute left-[-8rem] top-[-8rem] h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(circle,rgba(124,58,237,0.22),transparent_68%)] blur-3xl" />
-        <div className="absolute right-[-10rem] top-40 h-[34rem] w-[34rem] rounded-full bg-[radial-gradient(circle,rgba(37,99,235,0.18),transparent_70%)] blur-3xl" />
-        <div className="absolute bottom-0 left-1/2 h-[28rem] w-[28rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(236,72,153,0.12),transparent_70%)] blur-3xl" />
+    <div className="flex min-h-screen bg-background text-foreground">
+      {/* ── 固定左侧边栏（桌面） ── */}
+      <aside className="hidden lg:flex w-52 shrink-0 flex-col border-r border-white/8 bg-background fixed top-0 left-0 h-screen z-30">
+        {/* 顶部 Logo */}
+        <div className="px-4 py-4 border-b border-white/8">
+          <div className="flex items-center justify-between mb-3">
+            <span className="font-heading font-bold text-base text-foreground">🧭 外贸导航</span>
+            <Link
+              href="/"
+              className="text-[11px] text-muted hover:text-foreground transition px-2 py-1 rounded-md hover:bg-white/5"
+            >
+              ← 主页
+            </Link>
+          </div>
+          <input
+            type="search"
+            value={query}
+            onChange={onSearch}
+            placeholder="搜索链接..."
+            className="w-full h-8 rounded-lg border border-white/10 bg-white/5 px-3 text-xs text-foreground outline-none placeholder:text-muted/60 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition"
+          />
+        </div>
+
+        {/* 分类列表 */}
+        <nav className="flex-1 overflow-y-auto py-2 px-2">
+          {visibleCategories.map((cat) => (
+            <a
+              key={cat.id}
+              href={`#${cat.id}`}
+              className={`flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all mb-0.5 ${
+                activeCategoryId === cat.id
+                  ? "bg-primary/15 text-foreground border border-primary/25"
+                  : "text-muted hover:bg-white/5 hover:text-foreground border border-transparent"
+              }`}
+            >
+              <span>{cat.emoji}</span>
+              <span className="truncate">{cat.title}</span>
+              <span className="ml-auto shrink-0 text-[10px] text-muted/60">{cat.links.length}</span>
+            </a>
+          ))}
+        </nav>
+      </aside>
+
+      {/* ── 移动端顶栏 ── */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-30 border-b border-white/8 bg-background/95 backdrop-blur-xl px-4 py-3">
+        <div className="flex items-center gap-3 mb-2">
+          <span className="font-heading font-bold text-sm text-foreground">🧭 外贸导航</span>
+          <input
+            type="search"
+            value={query}
+            onChange={onSearch}
+            placeholder="搜索..."
+            className="flex-1 h-8 rounded-lg border border-white/10 bg-white/5 px-3 text-xs text-foreground outline-none placeholder:text-muted/60 focus:border-primary/50 transition"
+          />
+          <Link href="/" className="text-[11px] text-muted hover:text-foreground transition shrink-0">← 主页</Link>
+        </div>
+        {/* 移动端分类横向滚动 */}
+        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+          {visibleCategories.map((cat) => (
+            <a
+              key={cat.id}
+              href={`#${cat.id}`}
+              className={`shrink-0 text-[11px] font-medium px-2.5 py-1 rounded-full border transition ${
+                activeCategoryId === cat.id
+                  ? "border-primary/40 bg-primary/15 text-foreground"
+                  : "border-white/10 text-muted"
+              }`}
+            >
+              {cat.emoji} {cat.title}
+            </a>
+          ))}
+        </div>
       </div>
 
-      <MobileTopBar
-        activeCategoryId={activeCategoryId}
-        query={query}
-        visibleCategories={visibleCategories}
-        onSearchChange={handleSearchChange}
-      />
-
-      <div className="mx-auto grid w-full max-w-[96rem] gap-8 px-5 py-6 sm:px-8 lg:grid-cols-[240px_minmax(0,1fr)] lg:px-10 lg:py-10">
-        <DesktopSidebar
-          activeCategoryId={activeCategoryId}
-          query={query}
-          visibleCategories={visibleCategories}
-          onSearchChange={handleSearchChange}
-        />
-
-        <div className="min-w-0">
-          <header className="mb-10 rounded-[1.75rem] border border-white/10 bg-surface/70 p-6 shadow-[0_24px_90px_rgba(0,0,0,0.22)] backdrop-blur sm:p-8">
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-accent">
-              Curated links
-            </p>
-            <div className="mt-4 flex items-center gap-4">
-              <BrandMark size={64} priority />
-              <h1 className="font-heading text-4xl font-bold text-foreground sm:text-6xl">
-                常用导航
-              </h1>
-            </div>
-            <p className="mt-5 max-w-2xl text-base leading-8 text-muted">
-              AI、开发、设计、效率、学习与社交资源的快速入口。搜索会实时过滤所有链接名称。
-            </p>
-          </header>
+      {/* ── 主内容区 ── */}
+      <div ref={mainRef} className="flex-1 lg:ml-52 pt-28 lg:pt-0">
+        <div className="max-w-6xl mx-auto px-4 py-6 lg:px-8 lg:py-8">
 
           {visibleCategories.length > 0 ? (
-            <div className="space-y-14">
-              {visibleCategories.map((category) => (
-                <section
-                  key={category.id}
-                  id={category.id}
-                  className="scroll-mt-28"
-                >
-                  <div className="mb-5 flex items-center justify-between gap-4">
-                    <h2 className="font-heading text-2xl font-bold text-foreground sm:text-3xl">
-                      <BrandMark
-                        size={32}
-                        className="mr-3 align-middle"
-                        aria-hidden="true"
-                      />
-                      {category.title}
+            <div className="space-y-8">
+              {visibleCategories.map((cat) => (
+                <section key={cat.id} id={cat.id} className="scroll-mt-28 lg:scroll-mt-8">
+                  {/* 分类标题 */}
+                  <div className="flex items-center gap-2 mb-3 pb-2 border-b border-white/8">
+                    <span className="text-base">{cat.emoji}</span>
+                    <h2 className="font-heading font-bold text-sm text-foreground tracking-wide">
+                      {cat.title}
                     </h2>
-                    <span className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-xs font-bold text-muted">
-                      {category.links.length}
-                    </span>
+                    <span className="text-[10px] text-muted/60 ml-1">({cat.links.length})</span>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-                    {category.links.map((link) => (
-                      <GoLinkCard
-                        key={`${category.id}-${link.name}`}
-                        link={link}
-                      />
+                  {/* 链接网格 */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-2 gap-y-1">
+                    {cat.links.map((link) => (
+                      <LinkItem key={`${cat.id}-${link.name}`} link={link} />
                     ))}
                   </div>
                 </section>
               ))}
             </div>
           ) : (
-            <div className="rounded-[1.5rem] border border-white/10 bg-surface/70 p-10 text-center shadow-[0_24px_90px_rgba(0,0,0,0.2)]">
-              <p className="font-heading text-2xl font-bold text-foreground">
-                没有找到匹配的链接
-              </p>
-              <p className="mt-3 text-sm text-muted">试试更短的关键词。</p>
+            <div className="text-center py-20 text-muted text-sm">
+              没有找到 &ldquo;{query}&rdquo; 相关链接
             </div>
           )}
         </div>
       </div>
-    </main>
-  );
-}
-
-type NavigationProps = {
-  activeCategoryId: string;
-  query: string;
-  visibleCategories: VisibleCategory[];
-  onSearchChange: (event: ChangeEvent<HTMLInputElement>) => void;
-};
-
-function DesktopSidebar({
-  activeCategoryId,
-  query,
-  visibleCategories,
-  onSearchChange,
-}: NavigationProps): ReactElement {
-  return (
-    <aside className="sticky top-6 hidden h-[calc(100vh-3rem)] flex-col rounded-[1.5rem] border border-white/10 bg-surface/75 p-4 shadow-[0_24px_90px_rgba(0,0,0,0.24)] backdrop-blur lg:flex">
-      <div className="mb-5">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="flex items-center gap-2 font-heading text-xl font-bold text-foreground">
-              <BrandMark size={32} />
-              <span>导航</span>
-            </p>
-            <p className="mt-1 text-xs text-muted">Quick launch board</p>
-          </div>
-          <Link
-            href="/"
-            className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-bold text-muted transition hover:border-white/25 hover:text-foreground"
-          >
-            ← 主页
-          </Link>
-        </div>
-
-        <label className="mt-5 block">
-          <span className="sr-only">搜索链接</span>
-          <input
-            type="search"
-            value={query}
-            onChange={onSearchChange}
-            placeholder="搜索链接..."
-            className="h-11 w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 text-sm font-medium text-foreground outline-none transition placeholder:text-muted/70 focus:border-primary/70 focus:ring-4 focus:ring-primary/15"
-          />
-        </label>
-      </div>
-
-      <nav aria-label="导航分类" className="flex-1 space-y-1 overflow-y-auto pr-1">
-        {visibleCategories.map((category) => (
-          <Link
-            key={category.id}
-            href={`#${category.id}`}
-            className={`flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
-              activeCategoryId === category.id
-                ? "border border-primary/40 bg-gradient-to-r from-primary/20 to-primary-end/15 text-foreground shadow-[0_12px_42px_rgba(124,58,237,0.18)]"
-                : "border border-transparent text-muted hover:bg-white/[0.05] hover:text-foreground"
-            }`}
-          >
-            <span className="flex items-center gap-2">
-              <BrandMark size={22} aria-hidden="true" />
-              {category.title}
-            </span>
-            <span className="text-xs text-muted">{category.links.length}</span>
-          </Link>
-        ))}
-      </nav>
-
-      <p className="mt-5 border-t border-white/10 pt-4 text-xs leading-5 text-muted">
-        © {new Date().getFullYear()} Luo Sir. Built for fast navigation.
-      </p>
-    </aside>
-  );
-}
-
-function MobileTopBar({
-  activeCategoryId,
-  query,
-  visibleCategories,
-  onSearchChange,
-}: NavigationProps): ReactElement {
-  return (
-    <div className="sticky top-0 z-40 border-b border-white/10 bg-background/88 px-5 py-4 backdrop-blur-xl lg:hidden">
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <p className="flex items-center gap-2 font-heading text-lg font-bold text-foreground">
-          <BrandMark size={30} />
-          <span>导航</span>
-        </p>
-        <Link
-          href="/"
-          className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-bold text-muted transition hover:border-white/25 hover:text-foreground"
-        >
-          ← 主页
-        </Link>
-      </div>
-
-      <label className="block">
-        <span className="sr-only">搜索链接</span>
-        <input
-          type="search"
-          value={query}
-          onChange={onSearchChange}
-          placeholder="搜索链接..."
-          className="h-11 w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 text-sm font-medium text-foreground outline-none transition placeholder:text-muted/70 focus:border-primary/70 focus:ring-4 focus:ring-primary/15"
-        />
-      </label>
-
-      <nav
-        aria-label="移动端导航分类"
-        className="-mx-5 mt-3 flex gap-2 overflow-x-auto px-5 pb-1"
-      >
-        {visibleCategories.map((category) => (
-          <Link
-            key={category.id}
-            href={`#${category.id}`}
-            className={`shrink-0 rounded-full border px-3 py-2 text-sm font-semibold transition ${
-              activeCategoryId === category.id
-                ? "border-primary/50 bg-primary/20 text-foreground"
-                : "border-white/10 bg-white/[0.04] text-muted"
-            }`}
-          >
-            <BrandMark
-              size={18}
-              className="mr-1.5 align-middle"
-              aria-hidden="true"
-            />
-            {category.title}
-          </Link>
-        ))}
-      </nav>
     </div>
   );
 }
 
-function GoLinkCard({ link }: { link: NavLink }): ReactElement {
-  const hostname = getHostname(link.url);
-
+function LinkItem({ link }: { link: NavLink }): ReactElement {
   return (
     <a
       href={link.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="group relative block min-h-30 overflow-hidden rounded-[1.25rem] border border-white/10 bg-surface/75 p-px transition duration-300 hover:-translate-y-1 hover:border-primary/70 hover:shadow-[0_20px_70px_rgba(124,58,237,0.22)]"
+      title={link.description ?? link.name}
+      className="group flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-muted hover:bg-white/6 hover:text-foreground transition-all duration-150 border border-transparent hover:border-white/8"
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-accent/0 to-primary-end/0 opacity-0 transition duration-300 group-hover:from-primary/24 group-hover:via-accent/10 group-hover:to-primary-end/22 group-hover:opacity-100" />
-      <div className="relative h-full rounded-[calc(1.25rem-1px)] bg-surface/90 p-4">
-        <div className="flex items-start gap-3">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05]">
-            <Image
-              src={getFaviconUrl(link.url)}
-              alt={`${link.name} favicon`}
-              width={32}
-              height={32}
-              className="h-8 w-8 rounded-md"
-              unoptimized
-            />
-          </span>
-          <span className="min-w-0">
-            <span className="block truncate text-base font-bold text-foreground">
-              {link.name}
-            </span>
-            <span className="mt-1 block truncate text-xs font-medium text-muted">
-              {hostname}
-            </span>
-          </span>
-        </div>
-        {link.description ? (
-          <p className="mt-4 line-clamp-2 text-sm leading-6 text-muted">
-            {link.description}
-          </p>
-        ) : null}
-      </div>
+      <span className="shrink-0 w-4 h-4 flex items-center justify-center">
+        <Image
+          src={getFaviconUrl(link.url)}
+          alt=""
+          width={16}
+          height={16}
+          className="w-4 h-4 rounded-sm opacity-80 group-hover:opacity-100 transition-opacity"
+          unoptimized
+        />
+      </span>
+      <span className="truncate font-medium">{link.name}</span>
     </a>
   );
 }
