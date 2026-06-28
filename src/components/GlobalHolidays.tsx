@@ -4,7 +4,7 @@ import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import type { ReactElement } from "react";
 import {
   HOLIDAYS_2026, CATEGORY_LABEL,
-  type Holiday, type HolidayCategory, type HolidayReligion,
+  type Holiday, type HolidayCategory,
 } from "@/data/holidays2026";
 
 // ── 工具函数 ──────────────────────────────────────────────────────────────────
