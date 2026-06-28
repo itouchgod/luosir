@@ -20,7 +20,7 @@ export function BrandMark({
       style={{ width: size, height: size, ...style }}
     >
       <Image
-        src="/brand/logo-light.png"
+        src="/brand/logo.png"
         alt="Luo Sir logo"
         width={size}
         height={size}
