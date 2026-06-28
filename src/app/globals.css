@@ -71,28 +71,6 @@ html[data-theme="light"] .text-orange-200  { color: #9a3412 !important; }
 html[data-theme="light"] .bg-orange-500\/15 { background-color: rgba(154,52,18,0.10) !important; }
 html[data-theme="light"] .border-orange-500\/20 { border-color: rgba(154,52,18,0.18) !important; }
 
-.brand-mark {
-  box-shadow: 0 0 28px rgba(88, 166, 255, 0.24);
-}
-
-.brand-mark__image--light {
-  display: none;
-}
-
-html[data-theme="light"] .brand-mark {
-  border-color: rgba(30, 80, 50, 0.14) !important;
-  background-color: #f0f4ec;
-  box-shadow: 0 8px 22px rgba(45, 122, 80, 0.14);
-}
-
-html[data-theme="light"] .brand-mark__image--dark {
-  display: none;
-}
-
-html[data-theme="light"] .brand-mark__image--light {
-  display: block;
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
