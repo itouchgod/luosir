@@ -13,6 +13,14 @@
 
 Next.js 15 · React 19 · TypeScript · Tailwind CSS v4 · Vercel
 
+## 品牌资源
+
+- 页面 Logo：`public/brand/logo-light.png`，透明底，浅色 / 暗色主题共用
+- 浏览器图标：`src/app/icon.png` 与 `src/app/favicon.ico`
+- 分享预览图：`public/og-image.png`
+
+Logo 更新规范与组件约束见 [AGENTS.md](./AGENTS.md)。
+
 ## 开发
 
 ```bash

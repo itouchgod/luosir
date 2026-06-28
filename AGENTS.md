@@ -16,6 +16,8 @@ src/
 │   ├── layout.tsx          # 根布局：字体、主题初始化脚本、BackToTop
 │   ├── page.tsx            # 首页（全屏 TabView，无 Footer）
 │   ├── go/page.tsx         # /go 外贸导航页
+│   ├── icon.png            # 512x512 透明底浏览器 / App 图标
+│   ├── favicon.ico         # 256x256 透明底 favicon
 │   └── globals.css         # 全局主题变量 & 工具覆写
 ├── components/
 │   ├── TabView.tsx         # 三选项卡容器（世界时钟 / 全球假日 / 大写转换）
@@ -35,6 +37,12 @@ src/
 └── data/
     ├── holidays2026.ts     # 2026 年全球 186 个假日数据
     └── go-links.ts         # /go 页导航链接分类数据
+
+public/
+├── brand/
+│   ├── logo-light.png      # 1000x1000 透明底 Logo
+│   └── logo-dark.png       # 同源透明底 Logo，保留路径兼容
+└── og-image.png            # 1200x630 社交分享预览图
 ```
 
 ---
@@ -72,6 +80,36 @@ html[data-theme="light"] {
 ### 亮色模式白色透明度覆写
 
 Tailwind 的 `bg-white/[0.04]`、`border-white/10` 等在亮色下用 `globals.css` 里的 `!important` 规则替换为绿调 `rgba(30,80,50,…)`，统一视觉风格。
+
+---
+
+## 品牌与图标资源
+
+### Logo 资源
+
+- 页面内 Logo 统一通过 `BrandMark` 渲染。
+- `BrandMark` 使用透明底 PNG：`/brand/logo-light.png`。
+- `public/brand/logo-dark.png` 与 `logo-light.png` 保持同源透明底文件，仅保留给旧引用或未来兼容使用。
+- 不再按亮 / 暗主题切换 Logo；浅色和暗色模式都使用同一个透明底 Logo。
+- 不给 Logo 外层增加圆形底、黑 / 白底、边框、裁切或阴影；保持 `object-contain`，避免新 Logo 被裁边或出现色块。
+
+### 浏览器图标与分享图
+
+- `src/app/icon.png`：512x512 透明底 PNG，由 Next App Router 自动暴露为 `/icon.png`。
+- `src/app/favicon.ico`：256x256 透明底 favicon，浏览器标签页优先使用。
+- `layout.tsx` 的 `metadata.icons` 显式指向 `/icon.png` 与 `/favicon.ico`。
+- `public/og-image.png`：1200x630 社交分享预览图，使用同一 Logo 基图生成。
+
+### 更新 Logo 时
+
+1. 用新的透明底基图同步生成：
+   - `public/brand/logo-light.png`
+   - `public/brand/logo-dark.png`
+   - `src/app/icon.png`
+   - `src/app/favicon.ico`
+   - `public/og-image.png`
+2. 保持 `BrandMark` 单图透明渲染，不恢复主题切换或容器背景。
+3. 更新后至少检查首页和 `/go` 在亮 / 暗主题下的顶部 Logo，以及 `npm run build`。
 
 ---
 
@@ -144,6 +182,12 @@ Tailwind 的 `bg-white/[0.04]`、`border-white/10` 等在亮色下用 `globals.c
 - `fixed top-1/2 right-6 -translate-y-1/2 z-50`
 - 下滑 300px 后从右侧滑入，`opacity-0 translate-x-16` → `opacity-100 translate-x-0`
 
+### BrandMark
+
+- 仅负责渲染透明底 Logo 本体。
+- 默认使用 `size` 控制宽高，图片用 `object-contain`。
+- 不在组件或全局 CSS 中添加主题相关背景、圆角底、边框、阴影或 `object-cover`。
+
 ---
 
 ## 样式约定
@@ -164,3 +208,5 @@ Tailwind 的 `bg-white/[0.04]`、`border-white/10` 等在亮色下用 `globals.c
 | sticky 失效 | 无近祖滚动容器，或祖先设了 `overflow: hidden` | 确认 sticky 元素的最近滚动祖先是 `overflow-y-auto` |
 | 亮色下 white/opacity 色差 | Tailwind 生成纯白透明，亮色下偏白 | globals.css 用 `!important` 替换为绿调 rgba |
 | 颜色泄漏（如 amber） | lint/格式化工具自动修改了 `text-primary` | 检查并还原为 `text-primary`、`border-primary/20` |
+| Logo 出现方形底 / 圆底 | 给 `BrandMark` 外层加了背景、阴影、圆角或用了非透明图 | 使用透明底 PNG，`BrandMark` 只保留透明容器 + `object-contain` |
+| favicon 仍是旧图 | 只替换了页面 Logo，没同步 `src/app/favicon.ico` / `src/app/icon.png` | 同步替换 App Router 图标文件，并确认 `metadata.icons` |
