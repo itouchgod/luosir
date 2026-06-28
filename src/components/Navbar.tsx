@@ -46,7 +46,7 @@ export function Navbar(): ReactElement {
         className="mx-auto flex h-18 max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10"
       >
         <Link
-          href="#hero"
+          href="/"
           className="flex items-center gap-3 font-heading text-lg font-bold tracking-[0.18em] text-foreground uppercase"
           onClick={() => setIsOpen(false)}
         >

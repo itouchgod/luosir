@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ChangeEvent, ReactElement } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { BrandMark } from "@/components/BrandMark";
 import { NAV_CATEGORIES, type NavCategory, type NavLink } from "@/data/go-links";
 
 type VisibleCategory = NavCategory & { links: NavLink[] };
@@ -72,7 +73,10 @@ export default function GoPage(): ReactElement {
         {/* 顶部 Logo */}
         <div className="px-4 py-4 border-b border-white/8">
           <div className="flex items-center justify-between mb-3">
-            <span className="font-heading font-bold text-base text-foreground">🧭 外贸导航</span>
+            <span className="flex items-center gap-2.5 font-heading font-bold text-base text-foreground">
+              <BrandMark size={28} priority />
+              外贸导航
+            </span>
             <Link
               href="/"
               className="text-[11px] text-muted hover:text-foreground transition px-2 py-1 rounded-md hover:bg-white/5"
@@ -112,7 +116,10 @@ export default function GoPage(): ReactElement {
       {/* ── 移动端顶栏 ── */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-30 border-b border-white/8 bg-background/95 backdrop-blur-xl px-4 py-3">
         <div className="flex items-center gap-3 mb-2">
-          <span className="font-heading font-bold text-sm text-foreground">🧭 外贸导航</span>
+          <span className="flex shrink-0 items-center gap-2 font-heading font-bold text-sm text-foreground">
+            <BrandMark size={24} priority />
+            外贸导航
+          </span>
           <input
             type="search"
             value={query}

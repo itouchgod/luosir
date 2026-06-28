@@ -23,6 +23,17 @@ export const metadata: Metadata = {
   title: "Luo Sir | 个人主页",
   description:
     "专注响应式界面设计与全栈系统开发，为创始人和产品团队打造高质量的数字体验。",
+  icons: {
+    icon: [
+      {
+        url: "/icon.png",
+        type: "image/png",
+        sizes: "512x512",
+      },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/icon.png",
+  },
   openGraph: {
     title: "Luo Sir | 个人主页",
     description:
