@@ -763,43 +763,51 @@ function TimeGrid({
 
   return (
     <div className="space-y-4 lg:space-y-5">
-      <div className="flex items-center justify-between gap-2 lg:hidden">
-        <div className="flex shrink-0 items-center gap-2">
-          <span className="text-primary">
-            <ClockIcon />
-          </span>
-          <h1 className="text-base font-semibold text-foreground">世界时钟</h1>
+      <div>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex shrink-0 items-center gap-2">
+            <span className="text-primary">
+              <ClockIcon />
+            </span>
+            <h1 className="text-base font-semibold text-foreground lg:text-lg">
+              世界时钟
+            </h1>
+          </div>
+
+          <div className="flex min-w-0 items-center justify-end gap-1 lg:gap-2">
+            <button
+              type="button"
+              onClick={() => shiftDay(-1)}
+              aria-label="前一天"
+              className="rounded-lg p-1 text-muted transition-colors hover:bg-white/[0.05] hover:text-foreground lg:p-1.5"
+            >
+              ‹
+            </button>
+            <span className="w-[84px] text-center text-xs font-medium text-foreground lg:w-32 lg:text-sm">
+              {getDateLabel(currentUtcMs, homeCity.timezone)}
+            </span>
+            <button
+              type="button"
+              onClick={() => shiftDay(1)}
+              aria-label="后一天"
+              className="rounded-lg p-1 text-muted transition-colors hover:bg-white/[0.05] hover:text-foreground lg:p-1.5"
+            >
+              ›
+            </button>
+            <button
+              type="button"
+              onClick={onAddCityClick}
+              className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg border border-primary/25 bg-primary/15 px-2 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20 lg:gap-1.5 lg:rounded-xl lg:px-3 lg:text-sm"
+            >
+              <PlusIcon />
+              添加城市
+            </button>
+          </div>
         </div>
 
-        <div className="flex min-w-0 items-center justify-end gap-1">
-          <button
-            type="button"
-            onClick={() => shiftDay(-1)}
-            aria-label="前一天"
-            className="rounded-lg p-1 text-muted transition-colors hover:bg-white/[0.05] hover:text-foreground"
-          >
-            ‹
-          </button>
-          <span className="w-[84px] text-center text-xs font-medium text-foreground">
-            {getDateLabel(currentUtcMs, homeCity.timezone)}
-          </span>
-          <button
-            type="button"
-            onClick={() => shiftDay(1)}
-            aria-label="后一天"
-            className="rounded-lg p-1 text-muted transition-colors hover:bg-white/[0.05] hover:text-foreground"
-          >
-            ›
-          </button>
-          <button
-            type="button"
-            onClick={onAddCityClick}
-            className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg border border-primary/25 bg-primary/15 px-2 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
-          >
-            <PlusIcon />
-            添加城市
-          </button>
-        </div>
+        <p className="mt-1 hidden text-sm text-muted lg:block">
+          拖动统一时间轴，各城市同步联动
+        </p>
       </div>
 
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -876,28 +884,6 @@ function TimeGrid({
               </button>
             )}
           </div>
-
-          <div className="hidden shrink-0 items-center gap-1 lg:flex">
-            <button
-              type="button"
-              onClick={() => shiftDay(-1)}
-              aria-label="前一天"
-              className="rounded-lg p-1.5 text-muted transition-colors hover:bg-white/[0.05] hover:text-foreground"
-            >
-              ‹
-            </button>
-            <span className="w-[108px] text-center text-sm font-medium text-foreground sm:w-32">
-              {getDateLabel(currentUtcMs, homeCity.timezone)}
-            </span>
-            <button
-              type="button"
-              onClick={() => shiftDay(1)}
-              aria-label="后一天"
-              className="rounded-lg p-1.5 text-muted transition-colors hover:bg-white/[0.05] hover:text-foreground"
-            >
-              ›
-            </button>
-          </div>
         </div>
 
         <div className="hidden items-center justify-between gap-2 lg:flex lg:justify-end lg:gap-3">
@@ -929,14 +915,6 @@ function TimeGrid({
               回到现在
             </button>
           )}
-          <button
-            type="button"
-            onClick={onAddCityClick}
-            className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl border border-primary/25 bg-primary/15 px-3 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary/20"
-          >
-            <PlusIcon />
-            添加城市
-          </button>
         </div>
       </div>
 
@@ -1148,16 +1126,6 @@ export function WorldClock(): ReactElement {
 
   return (
     <section className="w-full max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:py-8">
-      <div className="mb-5 hidden lg:block">
-        <div className="mb-1 flex items-center gap-2">
-          <span className="text-primary">
-            <ClockIcon />
-          </span>
-          <h1 className="text-lg font-semibold text-foreground">世界时钟</h1>
-        </div>
-        <p className="text-sm text-muted">拖动统一时间轴，各城市同步联动</p>
-      </div>
-
       <TimeGrid
         cityIds={cityIds}
         homeCityId={homeCityId}
