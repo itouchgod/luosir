@@ -763,6 +763,45 @@ function TimeGrid({
 
   return (
     <div className="space-y-4 sm:space-y-5">
+      <div className="flex items-center justify-between gap-2 sm:hidden">
+        <div className="flex shrink-0 items-center gap-2">
+          <span className="text-primary">
+            <ClockIcon />
+          </span>
+          <h1 className="text-base font-semibold text-foreground">世界时钟</h1>
+        </div>
+
+        <div className="flex min-w-0 items-center justify-end gap-1">
+          <button
+            type="button"
+            onClick={() => shiftDay(-1)}
+            aria-label="前一天"
+            className="rounded-lg p-1 text-muted transition-colors hover:bg-white/[0.05] hover:text-foreground"
+          >
+            ‹
+          </button>
+          <span className="w-[84px] text-center text-xs font-medium text-foreground">
+            {getDateLabel(currentUtcMs, homeCity.timezone)}
+          </span>
+          <button
+            type="button"
+            onClick={() => shiftDay(1)}
+            aria-label="后一天"
+            className="rounded-lg p-1 text-muted transition-colors hover:bg-white/[0.05] hover:text-foreground"
+          >
+            ›
+          </button>
+          <button
+            type="button"
+            onClick={onAddCityClick}
+            className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg border border-primary/25 bg-primary/15 px-2 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+          >
+            <PlusIcon />
+            添加城市
+          </button>
+        </div>
+      </div>
+
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3">
           <div className="relative">
@@ -821,7 +860,24 @@ function TimeGrid({
             ) : null}
           </div>
 
-          <div className="ml-auto flex shrink-0 items-center gap-1 sm:ml-0">
+          <div className="ml-auto sm:hidden">
+            {realtime ? (
+              <span className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/15 px-2 py-1 text-xs text-primary">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
+                实时
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={resetNow}
+                className="shrink-0 whitespace-nowrap rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-background transition-opacity hover:opacity-90"
+              >
+                回到现在
+              </button>
+            )}
+          </div>
+
+          <div className="hidden shrink-0 items-center gap-1 sm:flex">
             <button
               type="button"
               onClick={() => shiftDay(-1)}
@@ -844,7 +900,7 @@ function TimeGrid({
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-2 sm:gap-3 lg:justify-end">
+        <div className="hidden items-center justify-between gap-2 sm:flex sm:gap-3 lg:justify-end">
           <div className="hidden shrink-0 items-center gap-2 whitespace-nowrap rounded-xl border border-white/8 bg-white/[0.04] px-2.5 py-2 text-xs text-muted sm:flex">
             <span className="flex items-center gap-1.5">
               <StatusSwatch status="work" />
@@ -1091,8 +1147,8 @@ export function WorldClock(): ReactElement {
   if (!mounted) return <div className="min-h-[60vh]" />;
 
   return (
-    <section className="w-full max-w-4xl mx-auto px-4 py-8 sm:px-6">
-      <div className="mb-5">
+    <section className="w-full max-w-4xl mx-auto px-4 py-6 sm:px-6 sm:py-8">
+      <div className="mb-5 hidden sm:block">
         <div className="mb-1 flex items-center gap-2">
           <span className="text-primary">
             <ClockIcon />
