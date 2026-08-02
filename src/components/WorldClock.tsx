@@ -1,13 +1,368 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import type { ReactElement, PointerEvent } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import type { ReactElement } from "react";
 
-// ── 内联图标 ──────────────────────────────────────────────────────────────────
+interface CityDef {
+  id: string;
+  nameCN: string;
+  nameEN: string;
+  country: string;
+  flag: string;
+  timezone: string;
+  keywords: string;
+}
+
+type WorkStatus = "work" | "edge" | "off";
+
+const ALL_CITIES: CityDef[] = [
+  {
+    id: "shenzhen",
+    nameCN: "深圳",
+    nameEN: "Shenzhen",
+    country: "中国",
+    flag: "🇨🇳",
+    timezone: "Asia/Shanghai",
+    keywords: "shenzhen sz china zhongguo",
+  },
+  {
+    id: "shanghai",
+    nameCN: "上海",
+    nameEN: "Shanghai",
+    country: "中国",
+    flag: "🇨🇳",
+    timezone: "Asia/Shanghai",
+    keywords: "shanghai china zhongguo",
+  },
+  {
+    id: "beijing",
+    nameCN: "北京",
+    nameEN: "Beijing",
+    country: "中国",
+    flag: "🇨🇳",
+    timezone: "Asia/Shanghai",
+    keywords: "beijing bj china zhongguo",
+  },
+  {
+    id: "hongkong",
+    nameCN: "香港",
+    nameEN: "Hong Kong",
+    country: "中国",
+    flag: "🇭🇰",
+    timezone: "Asia/Hong_Kong",
+    keywords: "hongkong hong kong hk xianggang",
+  },
+  {
+    id: "losangeles",
+    nameCN: "洛杉矶",
+    nameEN: "Los Angeles",
+    country: "美国",
+    flag: "🇺🇸",
+    timezone: "America/Los_Angeles",
+    keywords: "los angeles la us usa meiguo",
+  },
+  {
+    id: "newyork",
+    nameCN: "纽约",
+    nameEN: "New York",
+    country: "美国",
+    flag: "🇺🇸",
+    timezone: "America/New_York",
+    keywords: "new york ny us usa meiguo",
+  },
+  {
+    id: "chicago",
+    nameCN: "芝加哥",
+    nameEN: "Chicago",
+    country: "美国",
+    flag: "🇺🇸",
+    timezone: "America/Chicago",
+    keywords: "chicago us usa meiguo",
+  },
+  {
+    id: "toronto",
+    nameCN: "多伦多",
+    nameEN: "Toronto",
+    country: "加拿大",
+    flag: "🇨🇦",
+    timezone: "America/Toronto",
+    keywords: "toronto canada jianada",
+  },
+  {
+    id: "saopaulo",
+    nameCN: "圣保罗",
+    nameEN: "Sao Paulo",
+    country: "巴西",
+    flag: "🇧🇷",
+    timezone: "America/Sao_Paulo",
+    keywords: "sao paulo brazil baxi",
+  },
+  {
+    id: "mexicocity",
+    nameCN: "墨西哥城",
+    nameEN: "Mexico City",
+    country: "墨西哥",
+    flag: "🇲🇽",
+    timezone: "America/Mexico_City",
+    keywords: "mexico city moxige",
+  },
+  {
+    id: "london",
+    nameCN: "伦敦",
+    nameEN: "London",
+    country: "英国",
+    flag: "🇬🇧",
+    timezone: "Europe/London",
+    keywords: "london uk gb england yingguo",
+  },
+  {
+    id: "manchester",
+    nameCN: "曼彻斯特",
+    nameEN: "Manchester",
+    country: "英国",
+    flag: "🇬🇧",
+    timezone: "Europe/London",
+    keywords: "manchester uk gb england yingguo",
+  },
+  {
+    id: "paris",
+    nameCN: "巴黎",
+    nameEN: "Paris",
+    country: "法国",
+    flag: "🇫🇷",
+    timezone: "Europe/Paris",
+    keywords: "paris france faguo",
+  },
+  {
+    id: "berlin",
+    nameCN: "柏林",
+    nameEN: "Berlin",
+    country: "德国",
+    flag: "🇩🇪",
+    timezone: "Europe/Berlin",
+    keywords: "berlin germany deguo",
+  },
+  {
+    id: "amsterdam",
+    nameCN: "阿姆斯特丹",
+    nameEN: "Amsterdam",
+    country: "荷兰",
+    flag: "🇳🇱",
+    timezone: "Europe/Amsterdam",
+    keywords: "amsterdam netherlands helan",
+  },
+  {
+    id: "rome",
+    nameCN: "罗马",
+    nameEN: "Rome",
+    country: "意大利",
+    flag: "🇮🇹",
+    timezone: "Europe/Rome",
+    keywords: "rome italy yidali",
+  },
+  {
+    id: "madrid",
+    nameCN: "马德里",
+    nameEN: "Madrid",
+    country: "西班牙",
+    flag: "🇪🇸",
+    timezone: "Europe/Madrid",
+    keywords: "madrid spain xibanya",
+  },
+  {
+    id: "moscow",
+    nameCN: "莫斯科",
+    nameEN: "Moscow",
+    country: "俄罗斯",
+    flag: "🇷🇺",
+    timezone: "Europe/Moscow",
+    keywords: "moscow russia eluosi",
+  },
+  {
+    id: "istanbul",
+    nameCN: "伊斯坦布尔",
+    nameEN: "Istanbul",
+    country: "土耳其",
+    flag: "🇹🇷",
+    timezone: "Europe/Istanbul",
+    keywords: "istanbul turkey tuerqi",
+  },
+  {
+    id: "dubai",
+    nameCN: "迪拜",
+    nameEN: "Dubai",
+    country: "阿联酋",
+    flag: "🇦🇪",
+    timezone: "Asia/Dubai",
+    keywords: "dubai uae alianqiu",
+  },
+  {
+    id: "riyadh",
+    nameCN: "利雅得",
+    nameEN: "Riyadh",
+    country: "沙特",
+    flag: "🇸🇦",
+    timezone: "Asia/Riyadh",
+    keywords: "riyadh saudi shate",
+  },
+  {
+    id: "cairo",
+    nameCN: "开罗",
+    nameEN: "Cairo",
+    country: "埃及",
+    flag: "🇪🇬",
+    timezone: "Africa/Cairo",
+    keywords: "cairo egypt aiji",
+  },
+  {
+    id: "johannesburg",
+    nameCN: "约翰内斯堡",
+    nameEN: "Johannesburg",
+    country: "南非",
+    flag: "🇿🇦",
+    timezone: "Africa/Johannesburg",
+    keywords: "johannesburg south africa nanfei",
+  },
+  {
+    id: "newdelhi",
+    nameCN: "新德里",
+    nameEN: "New Delhi",
+    country: "印度",
+    flag: "🇮🇳",
+    timezone: "Asia/Kolkata",
+    keywords: "new delhi india yindu",
+  },
+  {
+    id: "mumbai",
+    nameCN: "孟买",
+    nameEN: "Mumbai",
+    country: "印度",
+    flag: "🇮🇳",
+    timezone: "Asia/Kolkata",
+    keywords: "mumbai india yindu",
+  },
+  {
+    id: "bangkok",
+    nameCN: "曼谷",
+    nameEN: "Bangkok",
+    country: "泰国",
+    flag: "🇹🇭",
+    timezone: "Asia/Bangkok",
+    keywords: "bangkok thailand taiguo",
+  },
+  {
+    id: "singapore",
+    nameCN: "新加坡",
+    nameEN: "Singapore",
+    country: "新加坡",
+    flag: "🇸🇬",
+    timezone: "Asia/Singapore",
+    keywords: "singapore xinjiapo",
+  },
+  {
+    id: "jakarta",
+    nameCN: "雅加达",
+    nameEN: "Jakarta",
+    country: "印尼",
+    flag: "🇮🇩",
+    timezone: "Asia/Jakarta",
+    keywords: "jakarta indonesia yinni",
+  },
+  {
+    id: "kualalumpur",
+    nameCN: "吉隆坡",
+    nameEN: "Kuala Lumpur",
+    country: "马来西亚",
+    flag: "🇲🇾",
+    timezone: "Asia/Kuala_Lumpur",
+    keywords: "kuala lumpur malaysia malaixiya",
+  },
+  {
+    id: "tokyo",
+    nameCN: "东京",
+    nameEN: "Tokyo",
+    country: "日本",
+    flag: "🇯🇵",
+    timezone: "Asia/Tokyo",
+    keywords: "tokyo japan riben",
+  },
+  {
+    id: "seoul",
+    nameCN: "首尔",
+    nameEN: "Seoul",
+    country: "韩国",
+    flag: "🇰🇷",
+    timezone: "Asia/Seoul",
+    keywords: "seoul korea hanguo",
+  },
+  {
+    id: "sydney",
+    nameCN: "悉尼",
+    nameEN: "Sydney",
+    country: "澳大利亚",
+    flag: "🇦🇺",
+    timezone: "Australia/Sydney",
+    keywords: "sydney australia aodaliya",
+  },
+  {
+    id: "melbourne",
+    nameCN: "墨尔本",
+    nameEN: "Melbourne",
+    country: "澳大利亚",
+    flag: "🇦🇺",
+    timezone: "Australia/Melbourne",
+    keywords: "melbourne australia aodaliya",
+  },
+  {
+    id: "auckland",
+    nameCN: "奥克兰",
+    nameEN: "Auckland",
+    country: "新西兰",
+    flag: "🇳🇿",
+    timezone: "Pacific/Auckland",
+    keywords: "auckland new zealand xinxilan",
+  },
+];
+
+const HOME_CITY_ID = "shanghai";
+const DEFAULT_CITY_IDS = [
+  "shanghai",
+  "newyork",
+  "losangeles",
+  "london",
+  "berlin",
+  "dubai",
+  "newdelhi",
+  "sydney",
+];
+
+const CITY_BY_ID = new Map(ALL_CITIES.map((city) => [city.id, city]));
+const TIME_PARTS_FORMATTERS = new Map<string, Intl.DateTimeFormat>();
+const WEEKDAY_FORMATTERS = new Map<string, Intl.DateTimeFormat>();
+
+const STATUS_COLOR: Record<WorkStatus, string> = {
+  work: "var(--timeline-work)",
+  edge: "var(--timeline-edge)",
+  off: "var(--timeline-off)",
+};
+
+const STATUS_LABEL: Record<WorkStatus, string> = {
+  work: "工作时间（09:00–17:00）",
+  edge: "边缘时间（08:00–09:00 / 17:00–19:00）",
+  off: "休息时间",
+};
 
 function ClockIcon(): ReactElement {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-5 w-5"
+    >
       <circle cx="12" cy="12" r="10" />
       <polyline points="12 6 12 12 16 14" />
     </svg>
@@ -16,526 +371,756 @@ function ClockIcon(): ReactElement {
 
 function PlusIcon(): ReactElement {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4"
+    >
       <line x1="12" y1="5" x2="12" y2="19" />
       <line x1="5" y1="12" x2="19" y2="12" />
     </svg>
   );
 }
 
-function XIcon({ className }: { className?: string }): ReactElement {
+function XIcon({
+  className = "h-4 w-4",
+}: {
+  className?: string;
+}): ReactElement {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className ?? "w-3 h-3"}>
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
       <line x1="18" y1="6" x2="6" y2="18" />
       <line x1="6" y1="6" x2="18" y2="18" />
     </svg>
   );
 }
 
-// ── 城市定义 ──────────────────────────────────────────────────────────────────
-
-interface CityDef {
-  id: string;
-  name: string;
-  country: string;
-  flag: string;
-  timezone: string;
+function ChevronDownIcon(): ReactElement {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-3 w-3"
+    >
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  );
 }
 
-const ALL_CITIES: CityDef[] = [
-  { id: "shenzhen",     name: "深圳",      country: "中国",     flag: "🇨🇳", timezone: "Asia/Shanghai" },
-  { id: "shanghai",     name: "上海",      country: "中国",     flag: "🇨🇳", timezone: "Asia/Shanghai" },
-  { id: "beijing",      name: "北京",      country: "中国",     flag: "🇨🇳", timezone: "Asia/Shanghai" },
-  { id: "hongkong",     name: "香港",      country: "中国",     flag: "🇭🇰", timezone: "Asia/Hong_Kong" },
-  { id: "losangeles",   name: "洛杉矶",    country: "美国",     flag: "🇺🇸", timezone: "America/Los_Angeles" },
-  { id: "newyork",      name: "纽约",      country: "美国",     flag: "🇺🇸", timezone: "America/New_York" },
-  { id: "chicago",      name: "芝加哥",    country: "美国",     flag: "🇺🇸", timezone: "America/Chicago" },
-  { id: "toronto",      name: "多伦多",    country: "加拿大",   flag: "🇨🇦", timezone: "America/Toronto" },
-  { id: "saopaulo",     name: "圣保罗",    country: "巴西",     flag: "🇧🇷", timezone: "America/Sao_Paulo" },
-  { id: "mexicocity",   name: "墨西哥城",  country: "墨西哥",   flag: "🇲🇽", timezone: "America/Mexico_City" },
-  { id: "london",       name: "伦敦",      country: "英国",     flag: "🇬🇧", timezone: "Europe/London" },
-  { id: "manchester",   name: "曼彻斯特",  country: "英国",     flag: "🇬🇧", timezone: "Europe/London" },
-  { id: "paris",        name: "巴黎",      country: "法国",     flag: "🇫🇷", timezone: "Europe/Paris" },
-  { id: "berlin",       name: "柏林",      country: "德国",     flag: "🇩🇪", timezone: "Europe/Berlin" },
-  { id: "amsterdam",    name: "阿姆斯特丹",country: "荷兰",     flag: "🇳🇱", timezone: "Europe/Amsterdam" },
-  { id: "rome",         name: "罗马",      country: "意大利",   flag: "🇮🇹", timezone: "Europe/Rome" },
-  { id: "madrid",       name: "马德里",    country: "西班牙",   flag: "🇪🇸", timezone: "Europe/Madrid" },
-  { id: "moscow",       name: "莫斯科",    country: "俄罗斯",   flag: "🇷🇺", timezone: "Europe/Moscow" },
-  { id: "istanbul",     name: "伊斯坦布尔",country: "土耳其",   flag: "🇹🇷", timezone: "Europe/Istanbul" },
-  { id: "dubai",        name: "迪拜",      country: "阿联酋",   flag: "🇦🇪", timezone: "Asia/Dubai" },
-  { id: "riyadh",       name: "利雅得",    country: "沙特",     flag: "🇸🇦", timezone: "Asia/Riyadh" },
-  { id: "cairo",        name: "开罗",      country: "埃及",     flag: "🇪🇬", timezone: "Africa/Cairo" },
-  { id: "johannesburg", name: "约翰内斯堡",country: "南非",     flag: "🇿🇦", timezone: "Africa/Johannesburg" },
-  { id: "newdelhi",     name: "新德里",    country: "印度",     flag: "🇮🇳", timezone: "Asia/Kolkata" },
-  { id: "mumbai",       name: "孟买",      country: "印度",     flag: "🇮🇳", timezone: "Asia/Kolkata" },
-  { id: "bangkok",      name: "曼谷",      country: "泰国",     flag: "🇹🇭", timezone: "Asia/Bangkok" },
-  { id: "singapore",    name: "新加坡",    country: "新加坡",   flag: "🇸🇬", timezone: "Asia/Singapore" },
-  { id: "jakarta",      name: "雅加达",    country: "印尼",     flag: "🇮🇩", timezone: "Asia/Jakarta" },
-  { id: "kualalumpur",  name: "吉隆坡",    country: "马来西亚", flag: "🇲🇾", timezone: "Asia/Kuala_Lumpur" },
-  { id: "tokyo",        name: "东京",      country: "日本",     flag: "🇯🇵", timezone: "Asia/Tokyo" },
-  { id: "seoul",        name: "首尔",      country: "韩国",     flag: "🇰🇷", timezone: "Asia/Seoul" },
-  { id: "sydney",       name: "悉尼",      country: "澳大利亚", flag: "🇦🇺", timezone: "Australia/Sydney" },
-  { id: "melbourne",    name: "墨尔本",    country: "澳大利亚", flag: "🇦🇺", timezone: "Australia/Melbourne" },
-  { id: "auckland",     name: "奥克兰",    country: "新西兰",   flag: "🇳🇿", timezone: "Pacific/Auckland" },
-];
+function SearchIcon(): ReactElement {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4"
+    >
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.3-4.3" />
+    </svg>
+  );
+}
 
-const HOME_CITY_ID = "shanghai";
-const HOME_TIMEZONE = "Asia/Shanghai";
+function getCity(id: string): CityDef | null {
+  return CITY_BY_ID.get(id) ?? null;
+}
 
-const DEFAULT_CITY_IDS = [
-  "shanghai", "newyork", "losangeles", "london",
-  "berlin", "sydney", "dubai", "newdelhi",
-];
-
-// ── 色带渐变 ──────────────────────────────────────────────────────────────────
-
-
-// ── 时区工具 ──────────────────────────────────────────────────────────────────
+function pad2(value: number): string {
+  return String(value).padStart(2, "0");
+}
 
 function getTimeParts(utcMs: number, timezone: string) {
-  const date = new Date(utcMs);
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: timezone,
-    year: "numeric", month: "2-digit", day: "2-digit",
-    hour: "2-digit", minute: "2-digit", second: "2-digit",
-    hour12: false,
-  }).formatToParts(date);
-  const p: Record<string, string> = {};
-  parts.forEach((x) => { p[x.type] = x.value; });
-  if (p.hour === "24") p.hour = "00";
+  let formatter = TIME_PARTS_FORMATTERS.get(timezone);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat("en-CA", {
+      timeZone: timezone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    });
+    TIME_PARTS_FORMATTERS.set(timezone, formatter);
+  }
+
+  const parts = formatter.formatToParts(new Date(utcMs));
+
+  const map: Record<string, string> = {};
+  parts.forEach((part) => {
+    map[part.type] = part.value;
+  });
+  if (map.hour === "24") map.hour = "00";
+
   return {
-    year: parseInt(p.year), month: parseInt(p.month), day: parseInt(p.day),
-    hour: parseInt(p.hour), minute: parseInt(p.minute), second: parseInt(p.second || "0"),
+    year: Number(map.year),
+    month: Number(map.month),
+    day: Number(map.day),
+    hour: Number(map.hour),
+    minute: Number(map.minute),
+    second: Number(map.second ?? "0"),
   };
 }
 
+function getWeekday(utcMs: number, timezone: string): string {
+  let formatter = WEEKDAY_FORMATTERS.get(timezone);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat("zh-CN", {
+      timeZone: timezone,
+      weekday: "short",
+    });
+    WEEKDAY_FORMATTERS.set(timezone, formatter);
+  }
+  const value = formatter.format(new Date(utcMs));
+  return value.replace("星期", "周");
+}
+
+function getDateLabel(utcMs: number, timezone: string): string {
+  const parts = getTimeParts(utcMs, timezone);
+  return (
+    pad2(parts.month) +
+    "月" +
+    pad2(parts.day) +
+    "日 " +
+    getWeekday(utcMs, timezone)
+  );
+}
+
+function getIsoDate(utcMs: number, timezone: string): string {
+  const parts = getTimeParts(utcMs, timezone);
+  return parts.year + "-" + pad2(parts.month) + "-" + pad2(parts.day);
+}
+
 function getTimezoneOffsetMin(utcMs: number, timezone: string): number {
-  const tp = getTimeParts(utcMs, timezone);
-  const localMs = Date.UTC(tp.year, tp.month - 1, tp.day, tp.hour, tp.minute, tp.second);
-  return (localMs - utcMs) / 60000;
+  const wholeSecondUtcMs = Math.floor(utcMs / 1_000) * 1_000;
+  const parts = getTimeParts(wholeSecondUtcMs, timezone);
+  const localMs = Date.UTC(
+    parts.year,
+    parts.month - 1,
+    parts.day,
+    parts.hour,
+    parts.minute,
+    parts.second
+  );
+  return (localMs - wholeSecondUtcMs) / 60_000;
 }
 
 function isDSTActive(utcMs: number, timezone: string): boolean {
   const year = new Date(utcMs).getUTCFullYear();
-  const janOff = getTimezoneOffsetMin(Date.UTC(year, 0, 15, 12), timezone);
-  const julOff = getTimezoneOffsetMin(Date.UTC(year, 6, 15, 12), timezone);
-  if (janOff === julOff) return false;
-  return getTimezoneOffsetMin(utcMs, timezone) === Math.max(janOff, julOff);
-}
-
-function getWeekdayCN(utcMs: number, timezone: string): string {
-  const map: Record<string, string> = {
-    Sunday: "日", Monday: "一", Tuesday: "二", Wednesday: "三",
-    Thursday: "四", Friday: "五", Saturday: "六",
-  };
-  const day = new Intl.DateTimeFormat("en-US", { timeZone: timezone, weekday: "long" })
-    .format(new Date(utcMs));
-  return `周${map[day] ?? "?"}`;
-}
-
-// ── 工作状态 ──────────────────────────────────────────────────────────────────
-
-type WorkStatus = { label: string; dot: string; badge: string };
-
-function getWorkStatus(hour: number, minute: number): WorkStatus {
-  const h = hour + minute / 60;
-  if (h >= 9 && h < 17) return {
-    label: "工作中",
-    dot: "bg-emerald-400",
-    badge: "text-emerald-300 bg-emerald-500/20 border border-emerald-500/25",
-  };
-  if ((h >= 8 && h < 9) || (h >= 17 && h < 19)) return {
-    label: "边缘时段",
-    dot: "bg-amber-400",
-    badge: "text-amber-200 bg-amber-500/20 border border-amber-500/25",
-  };
-  return {
-    label: "休息",
-    dot: "bg-white/15",
-    badge: "text-white/35 bg-white/5 border border-white/8",
-  };
-}
-
-// ── 可拖动时间条 ──────────────────────────────────────────────────────────────
-
-interface MiniTimelineProps {
-  hour: number;
-  minute: number;
-  flag: string;
-  timeStr: string;
-  onDrag: (fraction: number) => void;
-}
-
-function CityMiniTimeline({ hour, minute, flag, timeStr, onDrag }: MiniTimelineProps): ReactElement {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const dragging = useRef(false);
-  const markerPct = `${((hour + minute / 60) / 24 * 100).toFixed(3)}%`;
-
-  const getFrac = (e: PointerEvent<HTMLDivElement>) => {
-    const el = trackRef.current;
-    if (!el) return null;
-    const rect = el.getBoundingClientRect();
-    return Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-  };
-
-  const ticks = [
-    { h: 0,  align: "left" as const },
-    { h: 6,  align: "center" as const },
-    { h: 12, align: "center" as const },
-    { h: 18, align: "center" as const },
-    { h: 24, align: "right" as const },
-  ];
-
+  const janOffset = getTimezoneOffsetMin(Date.UTC(year, 0, 15, 12), timezone);
+  const julOffset = getTimezoneOffsetMin(Date.UTC(year, 6, 15, 12), timezone);
+  if (janOffset === julOffset) return false;
   return (
-    <div className="mt-2.5 select-none">
-      <div
-        ref={trackRef}
-        className="relative h-2 rounded-full cursor-pointer touch-none"
-        style={{ background: "var(--timeline-gradient)" }}
-        onPointerDown={(e) => {
-          dragging.current = true;
-          e.currentTarget.setPointerCapture(e.pointerId);
-          const f = getFrac(e);
-          if (f !== null) onDrag(f);
-        }}
-        onPointerMove={(e) => {
-          if (!dragging.current) return;
-          const f = getFrac(e);
-          if (f !== null) onDrag(f);
-        }}
-        onPointerUp={() => { dragging.current = false; }}
-        onPointerCancel={() => { dragging.current = false; }}
-      >
-        <div
-          className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none flex flex-col items-center"
-          style={{ left: markerPct }}
-        >
-          <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none">
-            <div className="bg-foreground text-background text-xs font-mono font-bold px-2.5 py-1 rounded-lg shadow-2xl whitespace-nowrap">
-              {timeStr}
-            </div>
-            <div className="w-0 h-0" style={{
-              borderLeft: "5px solid transparent",
-              borderRight: "5px solid transparent",
-              borderTop: "5px solid var(--color-foreground)",
-            }} />
-          </div>
-          <div className="absolute top-1/2 -translate-y-1/2 w-0.5 h-5 bg-foreground/80 rounded-full shadow-sm" />
-          <span className="text-base leading-none drop-shadow-md">{flag}</span>
-        </div>
-      </div>
-      <div className="relative h-3 mt-0.5">
-        {ticks.map(({ h, align }) => (
-          <span
-            key={h}
-            className="absolute text-[9px] text-white/20 leading-none top-0"
-            style={{
-              left: align === "left" ? "0" : align === "right" ? "auto" : `${h / 24 * 100}%`,
-              right: align === "right" ? "0" : "auto",
-              transform: align === "center" ? "translateX(-50%)" : "none",
-            }}
-          >
-            {h}
-          </span>
-        ))}
-      </div>
-    </div>
+    getTimezoneOffsetMin(utcMs, timezone) === Math.max(janOffset, julOffset)
   );
 }
 
-// ── 城市行 ────────────────────────────────────────────────────────────────────
-
-interface CityRowData extends CityDef {
-  timeStr: string;
-  dateStr: string;
-  hour: number;
-  minute: number;
-  dayDiff: number;
-  isDST: boolean;
-  isHome: boolean;
+function getWorkStatus(hour: number): WorkStatus {
+  if (hour >= 9 && hour < 17) return "work";
+  if ((hour >= 8 && hour < 9) || (hour >= 17 && hour < 19)) return "edge";
+  return "off";
 }
 
-function CityRow({
-  city,
-  onRemove,
-  onSliderDrag,
+function getDayDiff(
+  utcMs: number,
+  timezone: string,
+  homeTimezone: string
+): number {
+  const cityDate = getIsoDate(utcMs, timezone);
+  const homeDate = getIsoDate(utcMs, homeTimezone);
+  if (cityDate === homeDate) return 0;
+  return cityDate > homeDate ? 1 : -1;
+}
+
+function StatusSwatch({ status }: { status: WorkStatus }): ReactElement {
+  return (
+    <span
+      className="inline-block h-2.5 w-6 rounded-sm"
+      style={{ backgroundColor: STATUS_COLOR[status] }}
+    />
+  );
+}
+
+function AddCityModal({
+  cityIds,
+  onAdd,
+  onClose,
 }: {
-  city: CityRowData;
-  onRemove: (id: string) => void;
-  onSliderDrag: (fraction: number) => void;
+  cityIds: string[];
+  onAdd: (id: string) => void;
+  onClose: () => void;
 }): ReactElement {
-  const status = getWorkStatus(city.hour, city.minute);
+  const [query, setQuery] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
+  const filteredCities = useMemo(() => {
+    const value = query.trim().toLowerCase();
+    return ALL_CITIES.filter((city) => {
+      if (!value) return true;
+      return (
+        city.nameCN.includes(value) ||
+        city.nameEN.toLowerCase().includes(value) ||
+        city.country.includes(value) ||
+        city.keywords.includes(value)
+      );
+    }).slice(0, 24);
+  }, [query]);
 
   return (
-    <div className="px-4 pt-3 pb-2.5 rounded-xl border border-white/10 bg-white/[0.05] hover:bg-white/[0.07] transition-colors shadow-sm">
-      <div className="flex items-center gap-3">
-        {/* 国旗 + 城市名 */}
-        <div className="flex items-center gap-2 w-28 sm:w-36 shrink-0">
-          <span className="text-xl leading-none shrink-0">{city.flag}</span>
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5">
-              <span className="font-medium text-sm text-foreground truncate leading-snug">
-                {city.name}
-              </span>
-              {city.isHome && (
-                <span className="text-[9px] text-primary bg-primary/15 border border-primary/25 px-1 py-px rounded-full shrink-0 font-medium leading-none">
-                  本地
-                </span>
-              )}
+    <div
+      className="fixed inset-0 z-[60] flex items-start justify-center bg-black/60 px-4 pt-24 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-label="添加城市"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-sm overflow-hidden rounded-2xl border border-white/10 bg-background shadow-2xl"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="border-b border-white/8 p-4">
+          <div className="flex items-center gap-3">
+            <span className="shrink-0 text-muted">
+              <SearchIcon />
+            </span>
+            <input
+              ref={inputRef}
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="搜索城市或国家（中文 / 英文 / 拼音）"
+              className="min-w-0 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted"
+            />
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="关闭添加城市"
+              className="text-muted transition-colors hover:text-foreground"
+            >
+              <XIcon />
+            </button>
+          </div>
+        </div>
+        <div className="max-h-80 overflow-y-auto">
+          {filteredCities.length === 0 ? (
+            <div className="py-8 text-center text-sm text-muted">
+              未找到城市
             </div>
-            <div className="text-[10px] text-muted leading-none mt-0.5">{city.country}</div>
-          </div>
+          ) : (
+            filteredCities.map((city) => {
+              const selected = cityIds.includes(city.id);
+              return (
+                <button
+                  key={city.id}
+                  type="button"
+                  disabled={selected}
+                  onClick={() => {
+                    onAdd(city.id);
+                    onClose();
+                  }}
+                  className={
+                    "flex w-full items-center justify-between border-b border-white/5 px-4 py-3 text-left text-sm transition-colors last:border-0 " +
+                    (selected
+                      ? "cursor-not-allowed opacity-40"
+                      : "hover:bg-white/[0.05]")
+                  }
+                >
+                  <span className="flex min-w-0 items-center gap-2">
+                    <span className="text-lg">{city.flag}</span>
+                    <span className="min-w-0">
+                      <span className="font-medium text-foreground">
+                        {city.country !== "中国" && city.country !== city.nameCN
+                          ? city.country + " · " + city.nameCN
+                          : city.nameCN}
+                      </span>
+                      <span className="ml-1.5 text-muted">{city.nameEN}</span>
+                    </span>
+                  </span>
+                  {selected ? (
+                    <span className="text-xs text-primary">已添加</span>
+                  ) : null}
+                </button>
+              );
+            })
+          )}
         </div>
-
-        {/* 日期（桌面） */}
-        <div className="hidden sm:flex flex-col flex-1 gap-0.5 min-w-0">
-          <span className="text-xs text-muted truncate leading-snug">{city.dateStr}</span>
-          <div className="flex items-center gap-1">
-            {city.dayDiff !== 0 && (
-              <span className={`text-[10px] px-1.5 py-px rounded-full font-medium shrink-0 leading-tight border ${
-                city.dayDiff > 0
-                  ? "text-emerald-300 bg-emerald-500/15 border-emerald-500/20"
-                  : "text-orange-300 bg-orange-500/15 border-orange-500/20"
-              }`}>
-                {city.dayDiff > 0 ? `+${city.dayDiff}天` : `${city.dayDiff}天`}
-              </span>
-            )}
-            {city.isDST && (
-              <span className="text-[10px] px-1.5 py-px rounded-full font-medium text-violet-300 bg-violet-500/15 border border-violet-500/20 shrink-0 leading-tight">
-                夏令
-              </span>
-            )}
-          </div>
-        </div>
-
-        <div className="flex-1 sm:hidden" />
-
-        {/* 工作状态 */}
-        <span className={`flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full shrink-0 ${status.badge}`}>
-          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${status.dot}`} />
-          {status.label}
-        </span>
-
-        {/* 时间 */}
-        <div className="shrink-0 text-right min-w-[60px]">
-          <span className="text-lg font-semibold font-mono tabular-nums tracking-tight text-foreground leading-none">
-            {city.timeStr}
-          </span>
-        </div>
-
-        {/* 删除 */}
-        {city.isHome ? (
-          <div className="w-6 shrink-0" />
-        ) : (
-          <button
-            onClick={() => onRemove(city.id)}
-            className="w-6 h-6 shrink-0 flex items-center justify-center rounded-full text-muted hover:text-red-400 hover:bg-red-500/10 transition-colors"
-            aria-label={`删除 ${city.name}`}
-          >
-            <XIcon />
-          </button>
-        )}
       </div>
-
-      <CityMiniTimeline
-        hour={city.hour}
-        minute={city.minute}
-        flag={city.flag}
-        timeStr={city.timeStr}
-        onDrag={onSliderDrag}
-      />
     </div>
   );
 }
 
-// ── 主组件 ────────────────────────────────────────────────────────────────────
+function TimeGrid({
+  cityIds,
+  homeCityId,
+  currentUtcMs,
+  realtime,
+  onHomeCityChange,
+  onCurrentUtcMsChange,
+  onRealtimeChange,
+  onRemoveCity,
+  onAddCityClick,
+}: {
+  cityIds: string[];
+  homeCityId: string;
+  currentUtcMs: number;
+  realtime: boolean;
+  onHomeCityChange: (id: string) => void;
+  onCurrentUtcMsChange: (value: number | ((current: number) => number)) => void;
+  onRealtimeChange: (value: boolean) => void;
+  onRemoveCity: (id: string) => void;
+  onAddCityClick: () => void;
+}): ReactElement {
+  const [isMobile, setIsMobile] = useState(
+    () => window.matchMedia("(max-width: 767px)").matches
+  );
+  const [showHomeSelect, setShowHomeSelect] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
+    const update = (event: MediaQueryListEvent) => setIsMobile(event.matches);
+    mediaQuery.addEventListener("change", update);
+    return () => mediaQuery.removeEventListener("change", update);
+  }, []);
+
+  const homeCity =
+    getCity(homeCityId) ?? getCity(HOME_CITY_ID) ?? ALL_CITIES[0];
+  const homeTime = getTimeParts(currentUtcMs, homeCity.timezone);
+  const currentMinuteOfDay = homeTime.hour * 60 + homeTime.minute;
+  const homeHourStartUtc =
+    currentUtcMs -
+    homeTime.minute * 60_000 -
+    homeTime.second * 1_000 -
+    (currentUtcMs % 1_000);
+  const span = isMobile ? 1 : 6;
+  const columns = useMemo(
+    () =>
+      Array.from(
+        { length: span * 2 + 1 },
+        (_, index) => homeHourStartUtc + (index - span) * 3_600_000
+      ),
+    [homeHourStartUtc, span]
+  );
+  const cityColumnWidth = isMobile ? 104 : 150;
+  const hourMinWidth = isMobile ? 58 : 52;
+  const gridMinWidth = isMobile ? "100%" : "760px";
+  const gridTemplateColumns =
+    cityColumnWidth +
+    "px repeat(" +
+    columns.length +
+    ", minmax(" +
+    hourMinWidth +
+    "px, 1fr))";
+
+  const orderedCityIds = useMemo(
+    () => [homeCityId, ...cityIds.filter((id) => id !== homeCityId)],
+    [cityIds, homeCityId]
+  );
+
+  const setHomeMinute = (minuteOfDay: number) => {
+    onRealtimeChange(false);
+    onCurrentUtcMsChange(
+      (current) => current + (minuteOfDay - currentMinuteOfDay) * 60_000
+    );
+  };
+
+  const shiftDay = (days: number) => {
+    onRealtimeChange(false);
+    onCurrentUtcMsChange((current) => current + days * 86_400_000);
+  };
+
+  const resetNow = () => {
+    onRealtimeChange(true);
+    onCurrentUtcMsChange(Date.now());
+  };
+
+  return (
+    <div className="space-y-4 sm:space-y-5">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3">
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowHomeSelect((value) => !value)}
+              aria-expanded={showHomeSelect}
+              className="inline-flex max-w-[190px] items-center justify-center gap-1.5 rounded-lg border border-primary/25 bg-primary/15 px-2.5 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary/20 sm:max-w-none sm:px-3"
+            >
+              <span aria-hidden="true">📍</span>
+              <span className="truncate">
+                {homeCity.flag} {homeCity.nameCN}
+              </span>
+              <span className="hidden text-xs opacity-70 sm:inline">
+                · 我的城市
+              </span>
+              <ChevronDownIcon />
+            </button>
+            {showHomeSelect ? (
+              <>
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setShowHomeSelect(false)}
+                />
+                <div className="absolute left-0 top-full z-20 mt-1 min-w-40 rounded-xl border border-white/10 bg-background py-1 shadow-xl">
+                  {cityIds.map((id) => {
+                    const city = getCity(id);
+                    if (!city) return null;
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        onClick={() => {
+                          onHomeCityChange(id);
+                          setShowHomeSelect(false);
+                        }}
+                        className={
+                          "flex w-full items-center gap-2 px-4 py-2 text-left text-sm transition-colors hover:bg-white/[0.05] " +
+                          (id === homeCityId
+                            ? "font-medium text-primary"
+                            : "text-foreground")
+                        }
+                      >
+                        <span>{city.flag}</span>
+                        <span>{city.nameCN}</span>
+                        {id === homeCityId ? (
+                          <span className="ml-auto text-xs text-primary">
+                            ✓
+                          </span>
+                        ) : null}
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            ) : null}
+          </div>
+
+          <div className="ml-auto flex shrink-0 items-center gap-1 sm:ml-0">
+            <button
+              type="button"
+              onClick={() => shiftDay(-1)}
+              aria-label="前一天"
+              className="rounded-lg p-1.5 text-muted transition-colors hover:bg-white/[0.05] hover:text-foreground"
+            >
+              ‹
+            </button>
+            <span className="w-[108px] text-center text-sm font-medium text-foreground sm:w-32">
+              {getDateLabel(currentUtcMs, homeCity.timezone)}
+            </span>
+            <button
+              type="button"
+              onClick={() => shiftDay(1)}
+              aria-label="后一天"
+              className="rounded-lg p-1.5 text-muted transition-colors hover:bg-white/[0.05] hover:text-foreground"
+            >
+              ›
+            </button>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between gap-2 sm:gap-3 lg:justify-end">
+          <div className="hidden shrink-0 items-center gap-2 whitespace-nowrap rounded-xl border border-white/8 bg-white/[0.04] px-2.5 py-2 text-xs text-muted sm:flex">
+            <span className="flex items-center gap-1.5">
+              <StatusSwatch status="work" />
+              工作时间
+            </span>
+            <span className="flex items-center gap-1.5">
+              <StatusSwatch status="edge" />
+              边缘时间
+            </span>
+            <span className="flex items-center gap-1.5">
+              <StatusSwatch status="off" />
+              休息时间
+            </span>
+          </div>
+          {realtime ? (
+            <span className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/15 px-2 py-1 text-xs text-primary">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
+              实时
+            </span>
+          ) : (
+            <button
+              type="button"
+              onClick={resetNow}
+              className="shrink-0 whitespace-nowrap rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-background transition-opacity hover:opacity-90"
+            >
+              回到现在
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={onAddCityClick}
+            className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl border border-primary/25 bg-primary/15 px-3 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary/20"
+          >
+            <PlusIcon />
+            添加城市
+          </button>
+        </div>
+      </div>
+
+      <section className="rounded-2xl border border-white/10 bg-white/[0.04] px-3 pb-3 pt-6 shadow-sm sm:px-4 sm:pb-4 sm:pt-7">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <span className="w-9 text-right text-xs tabular-nums text-muted sm:w-10">
+            00:00
+          </span>
+          <div className="relative flex-1">
+            <input
+              type="range"
+              min={0}
+              max={1439}
+              step={1}
+              value={currentMinuteOfDay}
+              onChange={(event) => setHomeMinute(Number(event.target.value))}
+              aria-label="调整我的城市时间"
+              className="w-full cursor-pointer accent-primary"
+            />
+            <div className="pointer-events-none absolute -top-6 left-0 w-full">
+              <span
+                className="absolute -translate-x-1/2 rounded bg-foreground px-1.5 py-0.5 font-mono text-[11px] font-semibold tabular-nums text-background"
+                style={{ left: (currentMinuteOfDay / 1439) * 100 + "%" }}
+              >
+                {pad2(homeTime.hour)}:{pad2(homeTime.minute)}
+              </span>
+            </div>
+          </div>
+          <span className="w-9 text-xs text-muted sm:w-10">23:59</span>
+        </div>
+      </section>
+
+      <section className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] shadow-sm">
+        <div className="overflow-x-auto">
+          <div
+            className="grid border-b border-white/8"
+            style={{ gridTemplateColumns, minWidth: gridMinWidth }}
+          >
+            <div className="border-r border-dashed border-white/10 px-2 py-2 text-center text-xs font-medium text-muted sm:px-4">
+              城市
+            </div>
+            {columns.map((utcMs, index) => (
+              <div
+                key={utcMs}
+                className={
+                  "border-r border-dashed border-white/10 px-2 py-2 text-center font-mono text-xs transition-colors last:border-r-0 " +
+                  (index === span
+                    ? "bg-primary/15 font-bold text-primary"
+                    : "text-muted")
+                }
+              >
+                {pad2(getTimeParts(utcMs, homeCity.timezone).hour)}
+              </div>
+            ))}
+          </div>
+
+          {orderedCityIds.map((id) => {
+            const city = getCity(id);
+            if (!city) return null;
+            const cityTime = getTimeParts(currentUtcMs, city.timezone);
+            const isHome = id === homeCityId;
+            const dayDiff = getDayDiff(
+              currentUtcMs,
+              city.timezone,
+              homeCity.timezone
+            );
+            const dst = isDSTActive(currentUtcMs, city.timezone);
+
+            return (
+              <div
+                key={id}
+                className={
+                  "grid border-b border-white/5 last:border-0 transition-colors hover:bg-white/[0.03] " +
+                  (isHome ? "bg-primary/[0.06]" : "")
+                }
+                style={{ gridTemplateColumns, minWidth: gridMinWidth }}
+              >
+                <div className="flex items-center gap-1.5 border-r border-dashed border-white/10 px-2 py-2.5 sm:gap-2 sm:px-3 sm:py-3">
+                  <span className="text-sm sm:text-base">{city.flag}</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm font-medium text-foreground">
+                      {city.nameCN}
+                    </div>
+                    <div className="mt-0.5 flex items-center gap-1">
+                      {isHome ? (
+                        <span className="text-[10px] text-muted">本地</span>
+                      ) : null}
+                      {!isHome && dayDiff !== 0 ? (
+                        <span className="rounded bg-primary/15 px-1 py-0.5 text-[10px] font-semibold leading-none text-primary">
+                          {dayDiff > 0 ? "+" + dayDiff + "天" : dayDiff + "天"}
+                        </span>
+                      ) : null}
+                      {dst ? (
+                        <span className="text-[10px] font-medium text-primary">
+                          夏
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+                  {!isHome ? (
+                    <button
+                      type="button"
+                      onClick={() => onRemoveCity(id)}
+                      aria-label={"移除 " + city.nameCN}
+                      className="shrink-0 text-muted transition-colors hover:text-primary"
+                    >
+                      <XIcon className="h-3.5 w-3.5" />
+                    </button>
+                  ) : null}
+                </div>
+
+                {columns.map((utcMs, index) => {
+                  const parts = getTimeParts(utcMs, city.timezone);
+                  const status = getWorkStatus(parts.hour);
+                  const isReference = index === span;
+                  return (
+                    <div
+                      key={utcMs}
+                      title={
+                        city.nameCN +
+                        " · " +
+                        pad2(parts.hour) +
+                        ":" +
+                        pad2(parts.minute) +
+                        " · " +
+                        STATUS_LABEL[status]
+                      }
+                      className={
+                        "flex flex-col items-center justify-center border-r border-dashed border-white/10 px-1.5 py-2.5 last:border-r-0 sm:px-2 sm:py-3 " +
+                        (isReference
+                          ? "bg-primary/15 ring-2 ring-inset ring-primary/60"
+                          : "")
+                      }
+                    >
+                      <div
+                        className={
+                          "h-3 w-5/6 rounded-sm sm:h-3.5 " +
+                          (isReference ? "" : "opacity-70")
+                        }
+                        style={{ backgroundColor: STATUS_COLOR[status] }}
+                      />
+                      {isReference ? (
+                        <div className="mt-1 font-mono text-xs font-bold tabular-nums text-primary">
+                          {pad2(cityTime.hour)}:{pad2(cityTime.minute)}
+                        </div>
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+    </div>
+  );
+}
 
 export function WorldClock(): ReactElement {
   const [mounted, setMounted] = useState(false);
   const [cityIds, setCityIds] = useState<string[]>(DEFAULT_CITY_IDS);
+  const [homeCityId, setHomeCityId] = useState(HOME_CITY_ID);
+  const [currentUtcMs, setCurrentUtcMs] = useState(0);
+  const [realtime, setRealtime] = useState(true);
   const [showAddCity, setShowAddCity] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isRealtime, setIsRealtime] = useState(true);
-  const [currentUtcMs, setCurrentUtcMs] = useState<number>(0);
-  const nowRefMs = useRef<number>(Date.now());
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     setMounted(true);
-    const now = Date.now();
-    nowRefMs.current = now;
-    setCurrentUtcMs(now);
+    setCurrentUtcMs(Date.now());
   }, []);
 
   useEffect(() => {
-    if (!mounted) return;
-    timerRef.current = setInterval(() => {
-      const now = Date.now();
-      nowRefMs.current = now;
-      if (isRealtime) setCurrentUtcMs(now);
-    }, 1000);
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [mounted, isRealtime]);
+    if (!mounted || !realtime) return;
+    let minuteTimer: number | undefined;
+    const alignTimer = window.setTimeout(
+      () => {
+        setCurrentUtcMs(Date.now());
+        minuteTimer = window.setInterval(
+          () => setCurrentUtcMs(Date.now()),
+          60_000
+        );
+      },
+      60_000 - (Date.now() % 60_000)
+    );
 
-  const handleCitySliderDrag = useCallback((fraction: number, cityHour: number, cityMinute: number) => {
-    setIsRealtime(false);
-    const desiredHour = fraction * 24;
-    const currentHour = cityHour + cityMinute / 60;
-    const deltaMs = (desiredHour - currentHour) * 3_600_000;
-    setCurrentUtcMs((prev) => prev + deltaMs);
-  }, []);
-
-  const handleResetRealtime = useCallback(() => {
-    setIsRealtime(true);
-    setCurrentUtcMs(nowRefMs.current);
-  }, []);
-
-  const removeCity = useCallback((id: string) => {
-    if (id === HOME_CITY_ID) return;
-    setCityIds((prev) => prev.filter((c) => c !== id));
-  }, []);
+    return () => {
+      window.clearTimeout(alignTimer);
+      if (minuteTimer !== undefined) window.clearInterval(minuteTimer);
+    };
+  }, [mounted, realtime]);
 
   const addCity = useCallback((id: string) => {
-    if (cityIds.includes(id)) return;
-    setCityIds((prev) => [...prev, id]);
-    setShowAddCity(false);
-    setSearchQuery("");
-  }, [cityIds]);
+    setCityIds((current) =>
+      current.includes(id) ? current : [...current, id]
+    );
+  }, []);
 
-  const cityData = useMemo((): CityRowData[] => {
-    if (!currentUtcMs) return [];
-    const homeTp = getTimeParts(currentUtcMs, HOME_TIMEZONE);
-    const homeDayMs = Date.UTC(homeTp.year, homeTp.month - 1, homeTp.day);
+  const removeCity = useCallback(
+    (id: string) => {
+      if (id === homeCityId) return;
+      setCityIds((current) => current.filter((cityId) => cityId !== id));
+    },
+    [homeCityId]
+  );
 
-    return cityIds.flatMap((id) => {
-      const def = ALL_CITIES.find((c) => c.id === id);
-      if (!def) return [];
-      const tp = getTimeParts(currentUtcMs, def.timezone);
-      const localDayMs = Date.UTC(tp.year, tp.month - 1, tp.day);
-      const dayDiff = Math.round((localDayMs - homeDayMs) / 86_400_000);
-      const weekday = getWeekdayCN(currentUtcMs, def.timezone);
-      const dateStr = `${String(tp.month).padStart(2, "0")}月${String(tp.day).padStart(2, "0")}日 ${weekday}`;
-      const timeStr = `${String(tp.hour).padStart(2, "0")}:${String(tp.minute).padStart(2, "0")}`;
-      return [{
-        ...def, timeStr, dateStr,
-        hour: tp.hour, minute: tp.minute,
-        dayDiff,
-        isDST: isDSTActive(currentUtcMs, def.timezone),
-        isHome: id === HOME_CITY_ID,
-      }];
-    });
-  }, [cityIds, currentUtcMs]);
-
-  const availableCities = useMemo(() => {
-    const q = searchQuery.trim();
-    return ALL_CITIES.filter((c) => {
-      if (cityIds.includes(c.id)) return false;
-      if (!q) return true;
-      return c.name.includes(q) || c.country.includes(q);
-    });
-  }, [cityIds, searchQuery]);
+  const closeAddCity = useCallback(() => setShowAddCity(false), []);
 
   if (!mounted) return <div className="min-h-[60vh]" />;
 
   return (
-    <section className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-8">
-      {/* 页头 */}
-      <div className="flex items-start justify-between gap-3 mb-6">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-primary"><ClockIcon /></span>
-            <h1 className="text-lg font-semibold text-foreground">世界时钟</h1>
-          </div>
-          <p className="text-sm text-muted">拖动任意城市时间条，全局同步联动</p>
+    <section className="w-full max-w-4xl mx-auto px-4 py-8 sm:px-6">
+      <div className="mb-5">
+        <div className="mb-1 flex items-center gap-2">
+          <span className="text-primary">
+            <ClockIcon />
+          </span>
+          <h1 className="text-lg font-semibold text-foreground">世界时钟</h1>
         </div>
-        <button
-          onClick={handleResetRealtime}
-          className={`shrink-0 flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition-colors ${
-            isRealtime
-              ? "bg-primary/15 border-primary/30 text-primary"
-              : "bg-primary border-primary text-background font-semibold shadow-md hover:opacity-90"
-          }`}
-        >
-          {isRealtime
-            ? <><span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />实时</>
-            : <>↺ 回到实时</>
-          }
-        </button>
+        <p className="text-sm text-muted">拖动统一时间轴，各城市同步联动</p>
       </div>
 
-      {/* 城市列表 */}
-      <div className="space-y-2">
-        {cityData.map((city) => (
-          <CityRow
-            key={city.id}
-            city={city}
-            onRemove={removeCity}
-            onSliderDrag={(fraction) => handleCitySliderDrag(fraction, city.hour, city.minute)}
-          />
-        ))}
+      <TimeGrid
+        cityIds={cityIds}
+        homeCityId={homeCityId}
+        currentUtcMs={currentUtcMs}
+        realtime={realtime}
+        onHomeCityChange={setHomeCityId}
+        onCurrentUtcMsChange={setCurrentUtcMs}
+        onRealtimeChange={setRealtime}
+        onRemoveCity={removeCity}
+        onAddCityClick={() => setShowAddCity(true)}
+      />
 
-        <button
-          onClick={() => setShowAddCity(true)}
-          className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl border-2 border-dashed border-white/10 text-muted hover:border-primary/40 hover:text-primary transition-colors"
-        >
-          <PlusIcon />
-          <span className="text-sm">添加城市</span>
-        </button>
-      </div>
-
-      {/* 添加城市弹窗 */}
-      {showAddCity && (
-        <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm"
-          onClick={() => { setShowAddCity(false); setSearchQuery(""); }}
-        >
-          <div
-            className="bg-background border border-white/10 rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-sm max-h-[80vh] flex flex-col"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-white/8 shrink-0">
-              <h3 className="font-semibold text-foreground">添加城市</h3>
-              <button
-                onClick={() => { setShowAddCity(false); setSearchQuery(""); }}
-                className="w-7 h-7 flex items-center justify-center rounded-full text-muted hover:bg-white/10 transition-colors"
-              >
-                <XIcon className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="px-4 py-3 shrink-0">
-              <input
-                type="text"
-                placeholder="搜索城市或国家…"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-white/10 rounded-lg bg-white/5 text-foreground placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
-                autoFocus
-              />
-            </div>
-            <div className="overflow-y-auto flex-1 px-4 pb-4">
-              {availableCities.length === 0 ? (
-                <p className="text-sm text-muted text-center py-6">未找到匹配城市</p>
-              ) : (
-                <div className="space-y-0.5">
-                  {availableCities.map((city) => (
-                    <button
-                      key={city.id}
-                      onClick={() => addCity(city.id)}
-                      className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-left hover:bg-white/5 transition-colors"
-                    >
-                      <span className="text-lg leading-none">{city.flag}</span>
-                      <div>
-                        <div className="text-sm font-medium text-foreground">{city.name}</div>
-                        <div className="text-xs text-muted">{city.country}</div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      {showAddCity ? (
+        <AddCityModal
+          cityIds={cityIds}
+          onAdd={addCity}
+          onClose={closeAddCity}
+        />
+      ) : null}
     </section>
   );
 }

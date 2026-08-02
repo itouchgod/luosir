@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import type { ReactElement } from "react";
 import {
-  HOLIDAYS_2026, CATEGORY_LABEL,
+  HOLIDAYS_2026, CATEGORY_LABEL, getHolidayDetail,
   type Holiday, type HolidayCategory,
 } from "@/data/holidays2026";
 
@@ -73,6 +73,23 @@ function InfoIcon(): ReactElement {
   );
 }
 
+function ChevronDownIcon({ expanded }: { expanded: boolean }): ReactElement {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className={`h-3.5 w-3.5 shrink-0 text-muted transition-transform ${expanded ? "rotate-180" : ""}`}
+    >
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  );
+}
+
 // ── 样式常量 ──────────────────────────────────────────────────────────────────
 
 const CAT_DOT: Record<HolidayCategory, string> = {
@@ -134,54 +151,102 @@ function DaysBadge({ diff, days }: { diff: number; days: number }): ReactElement
 
 // ── HolidayRow ────────────────────────────────────────────────────────────────
 
-function HolidayRow({ holiday, diff }: { holiday: Holiday; diff: number }): ReactElement {
+function DetailSection({ icon, title, content }: { icon: string; title: string; content: string }): ReactElement {
+  return (
+    <div>
+      <div className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-foreground">
+        <span aria-hidden="true">{icon}</span>
+        <span>{title}</span>
+      </div>
+      <p className="whitespace-pre-line text-xs leading-relaxed text-muted">{content}</p>
+    </div>
+  );
+}
+
+function HolidayDetails({ holiday, id }: { holiday: Holiday; id: string }): ReactElement {
+  const detail = getHolidayDetail(holiday);
+
+  return (
+    <div id={id} className="border-t border-white/8 bg-white/[0.03] px-4 py-4">
+      <div className="space-y-4">
+        <DetailSection icon="🏛️" title="假期背景" content={detail.background} />
+        <DetailSection icon="📋" title="假期表现与商务影响" content={detail.businessImpact} />
+        <DetailSection icon="⚠️" title="禁忌与注意事项" content={detail.notes} />
+      </div>
+    </div>
+  );
+}
+
+function HolidayRow({
+  holiday,
+  diff,
+  expanded,
+  onToggle,
+}: {
+  holiday: Holiday;
+  diff: number;
+  expanded: boolean;
+  onToggle: () => void;
+}): ReactElement {
   const days = holiday.days ?? 1;
   const isOngoing = diff <= 0 && diff > -days;
   const startMD = formatDateMD(holiday.dateStart);
   const endMD = holiday.dateEnd ? formatDateMD(holiday.dateEnd) : null;
   const weekday = formatWeekday(holiday.dateStart);
+  const detailId = `holiday-detail-${holiday.id}`;
 
   return (
-    <div className={`flex items-start gap-3 py-3 px-4 border-b border-white/5 last:border-0 transition-colors ${
-      isOngoing           ? "bg-emerald-500/8" :
-      diff >= 0 && diff <= 7 ? "bg-amber-500/6" : ""
-    }`}>
-      {/* 日期列 */}
-      <div className="shrink-0 w-14 pt-0.5">
-        {endMD ? (
-          <>
-            <div className="text-sm font-bold font-mono leading-none text-foreground">{startMD}–</div>
-            <div className="text-sm font-bold font-mono leading-none mt-0.5 text-foreground">{endMD}</div>
-            <div className="text-[10px] text-muted mt-1">{weekday}</div>
-            <div className="text-[10px] text-muted">共 {days} 天</div>
-          </>
-        ) : (
-          <>
-            <div className="text-sm font-bold font-mono leading-none text-foreground">{startMD}</div>
-            <div className="text-[10px] text-muted mt-1">{weekday}</div>
-          </>
-        )}
-      </div>
-
-      {/* 分类彩点 */}
-      <div className={`shrink-0 w-2 h-2 rounded-full mt-2 ${CAT_DOT[holiday.category]}`} />
-
-      {/* 名称 */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5 flex-wrap">
-          {holiday.emoji && <span className="text-base leading-none">{holiday.emoji}</span>}
-          <span className="text-sm font-semibold leading-snug text-foreground">{holiday.nameCN}</span>
+    <div className="border-b border-white/5 last:border-0 transition-colors">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={expanded}
+        aria-controls={detailId}
+        className={`flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-white/[0.04] ${
+          isOngoing ? "bg-emerald-500/8" :
+          diff >= 0 && diff <= 7 ? "bg-amber-500/6" : ""
+        }`}
+      >
+        {/* 日期列 */}
+        <div className="shrink-0 w-14 pt-0.5">
+          {endMD ? (
+            <>
+              <div className="text-sm font-bold font-mono leading-none text-foreground">{startMD}–</div>
+              <div className="text-sm font-bold font-mono leading-none mt-0.5 text-foreground">{endMD}</div>
+              <div className="text-[10px] text-muted mt-1">{weekday}</div>
+              <div className="text-[10px] text-muted">共 {days} 天</div>
+            </>
+          ) : (
+            <>
+              <div className="text-sm font-bold font-mono leading-none text-foreground">{startMD}</div>
+              <div className="text-[10px] text-muted mt-1">{weekday}</div>
+            </>
+          )}
         </div>
-        <div className="text-xs mt-0.5 text-muted">{holiday.nameEN}</div>
-      </div>
 
-      {/* 右侧 */}
-      <div className="shrink-0 flex items-center gap-1.5 pt-0.5">
-        <DaysBadge diff={diff} days={days} />
-        <span className={`hidden sm:inline text-[10px] px-2 py-0.5 rounded-full font-medium ${CAT_BADGE[holiday.category]}`}>
-          {CATEGORY_LABEL[holiday.category]}
-        </span>
-      </div>
+        {/* 分类彩点 */}
+        <div className={`shrink-0 w-2 h-2 rounded-full mt-2 ${CAT_DOT[holiday.category]}`} />
+
+        {/* 名称 */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {holiday.emoji && <span className="text-base leading-none">{holiday.emoji}</span>}
+            <span className="text-sm font-semibold leading-snug text-foreground">{holiday.nameCN}</span>
+          </div>
+          <div className="text-xs mt-0.5 text-muted">{holiday.nameEN}</div>
+        </div>
+
+        {/* 右侧 */}
+        <div className="shrink-0 flex items-center gap-1.5 pt-0.5">
+          <DaysBadge diff={diff} days={days} />
+          <span className={`hidden sm:inline text-[10px] px-2 py-0.5 rounded-full font-medium ${CAT_BADGE[holiday.category]}`}>
+            {CATEGORY_LABEL[holiday.category]}
+          </span>
+          <ChevronDownIcon expanded={expanded} />
+        </div>
+      </button>
+
+      {expanded ? <HolidayDetails holiday={holiday} id={detailId} /> : null}
     </div>
   );
 }
@@ -192,14 +257,22 @@ export function GlobalHolidays(): ReactElement {
   const [mounted, setMounted] = useState(false);
   const [catFilter, setCatFilter] = useState<CategoryFilter>("all");
   const [subFilter, setSubFilter] = useState<string>("all");
-  const today = useMemo(() => todayStr(), []);
+  const [expandedHolidayId, setExpandedHolidayId] = useState<string | null>(null);
+  const currentMonthKey = useMemo(() => todayStr().slice(0, 7), []);
   const listRef = useRef<HTMLDivElement>(null);
+  const hasPositionedCurrentMonth = useRef(false);
 
   useEffect(() => { setMounted(true); }, []);
 
   const handleCatChange = useCallback((cat: CategoryFilter) => {
     setCatFilter(cat);
     setSubFilter("all");
+    setExpandedHolidayId(null);
+  }, []);
+
+  const handleSubFilterChange = useCallback((filter: string) => {
+    setSubFilter(filter);
+    setExpandedHolidayId(null);
   }, []);
 
   const subChipsConfig = useMemo(() => {
@@ -232,22 +305,24 @@ export function GlobalHolidays(): ReactElement {
     return Array.from(groups.entries()).map(([key, items]) => ({ key, items }));
   }, [catFilter, subFilter]);
 
-  const scrollTargetKey = useMemo(() => {
-    const todayMk = today.slice(0, 7);
-    const target = grouped.find(g =>
-      g.key >= todayMk && g.items.some(({ diff, holiday }) => diff >= 0 || (diff < 0 && diff > -(holiday.days ?? 1)))
-    );
-    return target?.key ?? grouped.find(g => g.key >= todayMk)?.key ?? null;
-  }, [grouped, today]);
+  const initialScrollTargetKey = useMemo(() => {
+    if (grouped.length === 0) return null;
+    return grouped.find(group => group.key >= currentMonthKey)?.key ?? grouped[0].key;
+  }, [currentMonthKey, grouped]);
 
   useEffect(() => {
-    if (!mounted || !scrollTargetKey) return;
-    const timer = setTimeout(() => {
-      const el = listRef.current?.querySelector(`[data-month="${scrollTargetKey}"]`);
-      el?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 200);
-    return () => clearTimeout(timer);
-  }, [mounted, scrollTargetKey]);
+    if (!mounted || hasPositionedCurrentMonth.current || !initialScrollTargetKey) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      const monthElement = listRef.current?.querySelector<HTMLElement>(`[data-month="${initialScrollTargetKey}"]`);
+      if (!monthElement) return;
+
+      hasPositionedCurrentMonth.current = true;
+      monthElement.scrollIntoView({ behavior: "auto", block: "start" });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [mounted, initialScrollTargetKey]);
 
   const totalHolidays = grouped.reduce((s, g) => s + g.items.length, 0);
 
@@ -291,7 +366,7 @@ export function GlobalHolidays(): ReactElement {
                 return (
                   <button
                     key={chip.key}
-                    onClick={() => setSubFilter(chip.key)}
+                    onClick={() => handleSubFilterChange(chip.key)}
                     className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors whitespace-nowrap ${
                       isActive
                         ? "bg-primary border-primary/60 text-background"
@@ -320,7 +395,7 @@ export function GlobalHolidays(): ReactElement {
             <div
               key={key}
               data-month={key}
-              className="bg-white/[0.04] border border-white/10 rounded-xl overflow-hidden scroll-mt-4"
+              className="bg-white/[0.04] border border-white/10 rounded-xl overflow-hidden scroll-mt-44"
             >
               {/* 月份标题 */}
               <div className="flex items-center px-4 py-2.5 border-b border-white/8 bg-white/[0.03]">
@@ -333,7 +408,13 @@ export function GlobalHolidays(): ReactElement {
               {/* 假日行 */}
               <div>
                 {items.map(({ holiday, diff }) => (
-                  <HolidayRow key={holiday.id} holiday={holiday} diff={diff} />
+                  <HolidayRow
+                    key={holiday.id}
+                    holiday={holiday}
+                    diff={diff}
+                    expanded={expandedHolidayId === holiday.id}
+                    onToggle={() => setExpandedHolidayId(current => current === holiday.id ? null : holiday.id)}
+                  />
                 ))}
               </div>
             </div>

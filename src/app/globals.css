@@ -11,6 +11,9 @@
   --color-text-secondary: #8b949e;
   --background: var(--color-background);
   --foreground: var(--color-text-primary);
+  --timeline-work: #58a6ff;
+  --timeline-edge: #d4a017;
+  --timeline-off: #4b5563;
   --timeline-gradient: linear-gradient(to right,
     #4b5563 0%,        #4b5563 20.83%,
     #d4a017 25%,       #388bfd 33.33%,
@@ -31,6 +34,9 @@ html[data-theme="light"] {
   --color-text-secondary: #4d6e58;
   --background: var(--color-background);
   --foreground: var(--color-text-primary);
+  --timeline-work: #1e6b42;
+  --timeline-edge: #e8c84a;
+  --timeline-off: #b0bdb8;
   --timeline-gradient: linear-gradient(to right,
     #b0bdb8 0%,        #b0bdb8 20.83%,
     #e8c84a 25%,       #2d7a50 33.33%,
