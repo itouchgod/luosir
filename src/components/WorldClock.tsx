@@ -762,8 +762,8 @@ function TimeGrid({
   };
 
   return (
-    <div className="space-y-4 sm:space-y-5">
-      <div className="flex items-center justify-between gap-2 sm:hidden">
+    <div className="space-y-4 lg:space-y-5">
+      <div className="flex items-center justify-between gap-2 lg:hidden">
         <div className="flex shrink-0 items-center gap-2">
           <span className="text-primary">
             <ClockIcon />
@@ -860,7 +860,7 @@ function TimeGrid({
             ) : null}
           </div>
 
-          <div className="ml-auto sm:hidden">
+          <div className="ml-auto lg:hidden">
             {realtime ? (
               <span className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/15 px-2 py-1 text-xs text-primary">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
@@ -877,7 +877,7 @@ function TimeGrid({
             )}
           </div>
 
-          <div className="hidden shrink-0 items-center gap-1 sm:flex">
+          <div className="hidden shrink-0 items-center gap-1 lg:flex">
             <button
               type="button"
               onClick={() => shiftDay(-1)}
@@ -900,7 +900,7 @@ function TimeGrid({
           </div>
         </div>
 
-        <div className="hidden items-center justify-between gap-2 sm:flex sm:gap-3 lg:justify-end">
+        <div className="hidden items-center justify-between gap-2 lg:flex lg:justify-end lg:gap-3">
           <div className="hidden shrink-0 items-center gap-2 whitespace-nowrap rounded-xl border border-white/8 bg-white/[0.04] px-2.5 py-2 text-xs text-muted sm:flex">
             <span className="flex items-center gap-1.5">
               <StatusSwatch status="work" />
@@ -1147,8 +1147,8 @@ export function WorldClock(): ReactElement {
   if (!mounted) return <div className="min-h-[60vh]" />;
 
   return (
-    <section className="w-full max-w-4xl mx-auto px-4 py-6 sm:px-6 sm:py-8">
-      <div className="mb-5 hidden sm:block">
+    <section className="w-full max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:py-8">
+      <div className="mb-5 hidden lg:block">
         <div className="mb-1 flex items-center gap-2">
           <span className="text-primary">
             <ClockIcon />
