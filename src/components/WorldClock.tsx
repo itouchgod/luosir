@@ -62,6 +62,15 @@ const ALL_CITIES: CityDef[] = [
     keywords: "los angeles la us usa meiguo",
   },
   {
+    id: "edinburgh",
+    nameCN: "爱丁堡",
+    nameEN: "Edinburgh",
+    country: "英国",
+    flag: "🇬🇧",
+    timezone: "Europe/London",
+    keywords: "edinburgh scotland uk gb yingguo",
+  },
+  {
     id: "newyork",
     nameCN: "纽约",
     nameEN: "New York",
@@ -105,15 +114,6 @@ const ALL_CITIES: CityDef[] = [
     flag: "🇲🇽",
     timezone: "America/Mexico_City",
     keywords: "mexico city moxige",
-  },
-  {
-    id: "london",
-    nameCN: "伦敦",
-    nameEN: "London",
-    country: "英国",
-    flag: "🇬🇧",
-    timezone: "Europe/London",
-    keywords: "london uk gb england yingguo",
   },
   {
     id: "manchester",
@@ -327,9 +327,9 @@ const ALL_CITIES: CityDef[] = [
 const HOME_CITY_ID = "shanghai";
 const DEFAULT_CITY_IDS = [
   "shanghai",
+  "edinburgh",
   "newyork",
   "losangeles",
-  "london",
   "berlin",
   "dubai",
   "newdelhi",
