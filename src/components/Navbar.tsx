@@ -13,6 +13,7 @@ type NavItem = {
 
 const navItems: readonly NavItem[] = [
   { label: "导航", href: "/go" },
+  { label: "易学", href: "/projects/yijing/bazi-align" },
   { label: "关于", href: "#about" },
   { label: "项目", href: "#work" },
   { label: "联系", href: "#contact" },
